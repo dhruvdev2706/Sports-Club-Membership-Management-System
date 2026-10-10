@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+ 
+@layer base {
+  :root {
+    --background: 220 25% 97%;      /* #F7F8FA */
+    --foreground: 220 43% 11%;      /* #101828 */
+
+    --card: 0 0% 100%;              /* #FFFFFF */
+    --card-foreground: 220 43% 11%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 43% 11%;
+ 
+    --primary: 220 43% 11%;         /* Midnight Navy #101828 */
+    --primary-foreground: 0 0% 100%;
+ 
+    --secondary: 216 18% 34%;       /* Slate #475467 */
+    --secondary-foreground: 0 0% 100%;
+ 
+    --muted: 220 13% 91%;
+    --muted-foreground: 216 18% 34%;
+ 
+    --accent: 86 86% 69%;           /* Vivid Green #B8F36B */
+    --accent-foreground: 220 43% 11%;
+ 
+    --destructive: 0 72% 51%;       /* Restrained red */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;          /* #E5E7EB */
+    --input: 220 13% 91%;
+    --ring: 220 43% 11%;
+ 
+    --radius: 0.75rem;              /* 12px */
+    
+    --success: 142 71% 45%;         /* Accessible green */
+    --warning: 38 92% 50%;          /* Warm amber */
+  }
+ 
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+ 
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+ 
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
