@@ -1,16 +1,17 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { 
-  Users, 
   Search, 
   Mail, 
   Phone, 
-  Award,
-  Loader2,
-  MoreVertical,
-  ShieldCheck
+  Award, 
+  ShieldCheck, 
+  GraduationCap 
 } from 'lucide-react';
-import { useState } from 'react';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Badge } from '@/components/ui/Badge';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 export default function CoachesList() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -36,22 +37,26 @@ export default function CoachesList() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-            <Users className="w-8 h-8 text-primary" /> Coaches Directory
-          </h1>
-          <p className="text-muted-foreground mt-1">Manage coaching staff, view profiles, and assignments.</p>
-        </div>
-      </div>
+      <PageHeader 
+        title="Coaching Staff" 
+        description="Certified professional instructors, specialized training staff, and athletic batch mentors."
+        badge={
+          coaches && (
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#242424] text-[#F5F5F5] border border-[#333333]">
+              {coaches.length} Coaches
+            </span>
+          )
+        }
+      />
 
-      <div className="bg-card border border-border rounded-xl shadow-sm p-4 flex flex-col sm:flex-row gap-4">
+      {/* Search Toolbar */}
+      <div className="bg-[#121212] border border-[#242424] rounded-[20px] p-4 shadow-sm flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A6A6AC]" />
           <input 
             type="text" 
-            placeholder="Search coaches by name or email..." 
-            className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors"
+            placeholder="Search coaches by name, specialization, or email..." 
+            className="w-full pl-10 pr-4 py-2.5 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all placeholder:text-[#555555]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -59,59 +64,56 @@ export default function CoachesList() {
       </div>
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-          <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-          <p>Loading coaches directory...</p>
+        <div className="flex flex-col items-center justify-center py-20 text-[#A6A6AC]">
+          <div className="w-9 h-9 border-2 border-[#FF4B16] border-t-transparent rounded-full animate-spin mb-3" />
+          <p className="text-sm">Loading coaching staff...</p>
         </div>
-      ) : (
+      ) : filteredCoaches && filteredCoaches.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredCoaches?.map((coach: any) => (
-            <div key={coach.id} className="group flex flex-col bg-card rounded-2xl border border-border shadow-sm hover:shadow-md transition-all overflow-hidden relative">
-              <div className="absolute top-4 right-4">
-                <button className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
-                  <MoreVertical className="w-4 h-4" />
-                </button>
-              </div>
-              
-              <div className="p-6 flex flex-col items-center text-center pb-4">
-                <div className="w-20 h-20 rounded-full bg-primary/10 border-4 border-card flex items-center justify-center text-primary text-2xl font-bold mb-4 shadow-sm relative">
+          {filteredCoaches.map((coach: any) => (
+            <div 
+              key={coach.id} 
+              className="group flex flex-col bg-[#121212] rounded-[26px] border border-[#242424] hover:border-[#383838] shadow-sm hover:-translate-y-1 transition-all overflow-hidden p-6"
+            >
+              <div className="flex flex-col items-center text-center pb-5">
+                <div className="w-20 h-20 rounded-2xl bg-[#5035E8]/20 border border-[#5035E8]/35 flex items-center justify-center text-[#A594FF] text-2xl font-extrabold mb-4 shadow-inner relative group-hover:scale-105 transition-transform">
                   {coach.full_name?.charAt(0) || 'C'}
-                  <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1 border border-border">
-                    <ShieldCheck className="w-4 h-4 text-primary" />
+                  <div className="absolute -bottom-1.5 -right-1.5 bg-[#000000] rounded-xl p-1 border border-[#282828] text-[#079C68]">
+                    <ShieldCheck className="w-4 h-4" />
                   </div>
                 </div>
                 
-                <h3 className="font-bold text-lg text-foreground line-clamp-1">{coach.full_name}</h3>
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary mt-2 uppercase tracking-wider">
-                  <Award className="w-3 h-3 mr-1" /> Coach
-                </span>
+                <h3 className="font-extrabold text-lg text-[#F5F5F5] line-clamp-1">{coach.full_name}</h3>
+                <div className="mt-2">
+                  <Badge variant="purple" size="sm">
+                    <Award className="w-3 h-3 mr-1" /> Head Coach
+                  </Badge>
+                </div>
               </div>
               
-              <div className="p-6 pt-2 mt-auto">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground bg-muted/30 p-2 rounded-lg border border-border/50">
-                    <Mail className="w-4 h-4 shrink-0 text-muted-foreground/70" />
-                    <span className="truncate" title={coach.email || 'N/A'}>{coach.email || 'No email provided'}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground bg-muted/30 p-2 rounded-lg border border-border/50">
-                    <Phone className="w-4 h-4 shrink-0 text-muted-foreground/70" />
-                    <span className="truncate">{coach.phone_number || 'No phone provided'}</span>
-                  </div>
+              <div className="space-y-2.5 pt-4 border-t border-[#1E1E1E] mt-auto">
+                <div className="flex items-center gap-3 text-xs text-[#A6A6AC] bg-[#181818] p-2.5 rounded-xl border border-[#262626]">
+                  <Mail className="w-4 h-4 shrink-0 text-[#FF4B16]" />
+                  <span className="truncate" title={coach.email || 'N/A'}>
+                    {coach.email || 'No email provided'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-[#A6A6AC] bg-[#181818] p-2.5 rounded-xl border border-[#262626]">
+                  <Phone className="w-4 h-4 shrink-0 text-[#079C68]" />
+                  <span className="truncate">
+                    {coach.phone_number || 'No phone on record'}
+                  </span>
                 </div>
               </div>
             </div>
           ))}
-          
-          {filteredCoaches?.length === 0 && (
-            <div className="col-span-full p-12 text-center border border-dashed border-border rounded-xl bg-muted/10">
-              <Users className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-1">No coaches found</h3>
-              <p className="text-muted-foreground mb-4">
-                {searchTerm ? 'No coaches match your search criteria.' : 'There are currently no coaches in the system.'}
-              </p>
-            </div>
-          )}
         </div>
+      ) : (
+        <EmptyState 
+          icon={<GraduationCap className="w-8 h-8" />}
+          title="No Coaches Found"
+          description={searchTerm ? `No instructors matched "${searchTerm}".` : 'No coach profiles have been added to the system yet.'}
+        />
       )}
     </div>
   );

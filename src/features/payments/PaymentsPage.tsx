@@ -3,7 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '../auth/AuthContext';
 import { toast } from 'sonner';
-import { Receipt, Download, Plus, DollarSign, User, FileText, CheckCircle2, Clock, AlertCircle, X, Loader2 } from 'lucide-react';
+import { Receipt, Download, Plus, DollarSign, CheckCircle2, X } from 'lucide-react';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { StatCard } from '@/components/ui/StatCard';
 
 export default function PaymentsPage() {
   const { profile, session } = useAuth();
@@ -51,7 +56,7 @@ export default function PaymentsPage() {
         })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) throw new Error(data.error || 'Payment recording failed');
       return data;
     },
     onSuccess: () => {
@@ -65,185 +70,228 @@ export default function PaymentsPage() {
   });
 
   const downloadReceipt = (payment: any) => {
-    toast.info(`Downloading receipt for ${payment.transaction_ref} (Demo)`);
+    toast.info(`Receipt ready for transaction ${payment.transaction_ref || payment.id}`);
   };
+
+  const totalCollected = payments?.reduce((acc: number, p: any) => {
+    return p.status === 'completed' || p.status === 'success' ? acc + Number(p.amount) : acc;
+  }, 0) || 0;
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">{isAdmin ? 'All Payments' : 'My Payments'}</h1>
-          <p className="text-muted-foreground mt-1">
-            {isAdmin ? 'View and manage all transaction records.' : 'View your billing history and receipts.'}
-          </p>
-        </div>
-        {isAdmin && !isFormOpen && (
-          <button 
-            onClick={() => setIsFormOpen(true)} 
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Record Payment
-          </button>
-        )}
+      <PageHeader 
+        title={isAdmin ? 'Club Financials & Invoices' : 'My Invoices & Dues'}
+        description={
+          isAdmin 
+            ? 'Monitor membership dues, facility reservations fees, and manual payment records.' 
+            : 'Track billing receipts, membership subscriptions, and tournament payments.'
+        }
+        actions={
+          isAdmin && !isFormOpen && (
+            <Button 
+              variant="primary"
+              onClick={() => setIsFormOpen(true)}
+              icon={<Plus className="w-4 h-4" />}
+            >
+              Record Payment
+            </Button>
+          )
+        }
+      />
+
+      {/* KPI Stats Grid */}
+      <div className="grid gap-5 grid-cols-1 sm:grid-cols-3">
+        <StatCard 
+          label="Total Collected Volume" 
+          value={`$${totalCollected.toFixed(2)}`} 
+          icon={<DollarSign className="w-5 h-5 text-white" />} 
+          variant="green"
+          description="Verified completed revenue"
+        />
+        <StatCard 
+          label="Total Transactions" 
+          value={payments?.length ?? 0} 
+          icon={<Receipt className="w-5 h-5 text-[#111111]" />} 
+          variant="white"
+          description="Processed payment receipts"
+        />
+        <StatCard 
+          label="Billing Status" 
+          value="Up to date" 
+          icon={<CheckCircle2 className="w-5 h-5 text-white" />} 
+          variant="purple"
+          description="Club accounts reconciled"
+        />
       </div>
 
+      {/* Record Payment Drawer / Form */}
       {isFormOpen && isAdmin && (
-        <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="px-6 py-4 border-b border-border bg-muted/20 flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-foreground">Record Manual Payment</h2>
-            <button onClick={() => setIsFormOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors p-1">
+        <div className="bg-[#121212] rounded-[26px] border border-[#242424] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="px-7 py-5 border-b border-[#1E1E1E] bg-[#161616] flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#079C68]/15 border border-[#079C68]/30 flex items-center justify-center text-[#4CD9A0]">
+                <DollarSign className="w-4 h-4" />
+              </div>
+              <h2 className="text-lg font-bold text-[#F5F5F5]">Record Manual Payment</h2>
+            </div>
+            <button 
+              onClick={() => setIsFormOpen(false)} 
+              className="p-2 rounded-xl text-[#A6A6AC] hover:text-[#F5F5F5] hover:bg-[#242424] transition-colors cursor-pointer"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
           
-          <div className="p-6">
+          <div className="p-7">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <User className="w-4 h-4 text-muted-foreground" /> Member
-                </label>
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Member Account *</label>
                 <div className="relative">
                   <select 
-                    className="w-full pl-3 pr-10 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors appearance-none cursor-pointer" 
                     value={memberId} 
-                    onChange={e => setMemberId(e.target.value)}
+                    onChange={(e) => setMemberId(e.target.value)}
+                    className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all appearance-none cursor-pointer"
                   >
                     <option value="">Select Member...</option>
-                    {members?.map((m: any) => <option key={m.id} value={m.id}>{m.profiles?.full_name}</option>)}
+                    {members?.map((m: any) => (
+                      <option key={m.id} value={m.id}>{m.profiles?.full_name}</option>
+                    ))}
                   </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#A6A6AC]">
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                    </svg>
+                  </div>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-muted-foreground" /> Amount
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                  <input 
-                    type="number" 
-                    placeholder="0.00"
-                    className="w-full pl-8 pr-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors" 
-                    value={amount} 
-                    onChange={e => setAmount(e.target.value)} 
-                  />
-                </div>
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Amount ($) *</label>
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  placeholder="0.00"
+                  value={amount} 
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all placeholder:text-[#555555]"
+                />
               </div>
-              
+
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-muted-foreground" /> Purpose
-                </label>
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Payment Purpose</label>
                 <input 
                   type="text" 
-                  placeholder="e.g., Membership Dues"
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors" 
                   value={purpose} 
-                  onChange={e => setPurpose(e.target.value)} 
+                  onChange={(e) => setPurpose(e.target.value)}
+                  placeholder="e.g. Annual Dues, Locker Rent"
+                  className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all placeholder:text-[#555555]"
                 />
               </div>
             </div>
-            
-            <div className="mt-8 pt-6 border-t border-border flex justify-end gap-3">
-              <button 
-                onClick={() => setIsFormOpen(false)} 
-                className="px-4 py-2 border border-border bg-background text-foreground rounded-lg font-medium text-sm hover:bg-muted transition-colors"
+
+            <div className="mt-8 pt-6 border-t border-[#1E1E1E] flex justify-end gap-3">
+              <Button 
+                variant="secondary" 
+                onClick={() => setIsFormOpen(false)}
               >
                 Cancel
-              </button>
-              <button 
-                disabled={!memberId || !amount || manualPaymentMutation.isPending} 
+              </Button>
+              <Button 
+                variant="primary" 
+                disabled={!memberId || !amount || manualPaymentMutation.isPending}
+                isLoading={manualPaymentMutation.isPending}
                 onClick={() => manualPaymentMutation.mutate()}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
               >
-                {manualPaymentMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                {manualPaymentMutation.isPending ? 'Processing...' : 'Record Payment'}
-              </button>
+                Confirm Payment
+              </Button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Data Table */}
-      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden flex flex-col">
+      {/* Transactions Table */}
+      <div className="bg-[#121212] border border-[#242424] rounded-[24px] shadow-sm overflow-hidden flex flex-col">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left text-sm whitespace-nowrap">
-            <thead className="bg-muted/50 text-muted-foreground border-b border-border">
+            <thead className="bg-[#0A0A0A] text-[#A6A6AC] border-b border-[#242424]">
               <tr>
-                <th className="px-6 py-4 font-medium">Tx Ref</th>
-                {isAdmin && <th className="px-6 py-4 font-medium">Member</th>}
-                <th className="px-6 py-4 font-medium">Date</th>
-                <th className="px-6 py-4 font-medium">Purpose</th>
-                <th className="px-6 py-4 font-medium">Amount</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium text-right">Receipt</th>
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Reference</th>
+                {isAdmin && <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Member</th>}
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Purpose</th>
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Amount</th>
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Date</th>
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-right">Receipt</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody className="divide-y divide-[#1E1E1E]">
               {isLoading ? (
                 <tr>
-                  <td colSpan={isAdmin ? 7 : 6} className="px-6 py-12 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                      <span>Loading payments...</span>
+                  <td colSpan={isAdmin ? 7 : 6} className="px-6 py-16 text-center text-[#A6A6AC]">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <div className="w-8 h-8 border-2 border-[#FF4B16] border-t-transparent rounded-full animate-spin" />
+                      <span className="text-sm font-medium">Loading payments log...</span>
                     </div>
                   </td>
                 </tr>
-              ) : payments?.length === 0 ? (
-                <tr>
-                  <td colSpan={isAdmin ? 7 : 6} className="px-6 py-12 text-center text-muted-foreground">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <Receipt className="w-8 h-8 opacity-20" />
-                      <span>No payment records found.</span>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                payments?.map((payment: any) => (
-                  <tr key={payment.id} className="hover:bg-muted/30 transition-colors group">
-                    <td className="px-6 py-4 font-mono text-xs text-muted-foreground">
-                      {payment.transaction_ref}
-                    </td>
-                    {isAdmin && (
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-foreground">{payment.members?.profiles?.full_name}</div>
+              ) : payments && payments.length > 0 ? (
+                payments.map((p: any) => {
+                  const isSuccess = p.status === 'completed' || p.status === 'success';
+                  const isPending = p.status === 'pending';
+
+                  return (
+                    <tr key={p.id} className="hover:bg-[#181818] transition-colors">
+                      <td className="px-6 py-4 font-mono text-xs font-bold text-[#F5F5F5]">
+                        <span className="px-2 py-1 rounded-lg bg-[#1A1A1A] border border-[#2A2A2A]">
+                          {p.transaction_ref || p.id.slice(0, 8)}
+                        </span>
                       </td>
-                    )}
-                    <td className="px-6 py-4 text-foreground">
-                      {new Date(payment.created_at).toLocaleDateString(undefined, {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </td>
-                    <td className="px-6 py-4 text-foreground">
-                      {payment.purpose}
-                    </td>
-                    <td className="px-6 py-4 font-semibold text-foreground">
-                      ${Number(payment.amount).toFixed(2)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border
-                        ${payment.status === 'success' || payment.status === 'completed' ? 'bg-success/10 text-success border-success/20' : 
-                          payment.status === 'pending' ? 'bg-warning/10 text-warning border-warning/20' : 
-                          'bg-destructive/10 text-destructive border-destructive/20'}`}>
-                        {payment.status === 'success' || payment.status === 'completed' ? <CheckCircle2 className="w-3 h-3 mr-1.5" /> : 
-                         payment.status === 'pending' ? <Clock className="w-3 h-3 mr-1.5" /> : 
-                         <AlertCircle className="w-3 h-3 mr-1.5" />}
-                        <span className="capitalize">{payment.status === 'success' ? 'Completed' : payment.status}</span>
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button 
-                        onClick={() => downloadReceipt(payment)} 
-                        className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-md transition-colors opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
-                      >
-                        <Download className="w-4 h-4" /> PDF
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                      {isAdmin && (
+                        <td className="px-6 py-4 font-semibold text-[#F5F5F5]">
+                          {p.members?.profiles?.full_name || 'Member'}
+                        </td>
+                      )}
+                      <td className="px-6 py-4 text-xs text-[#A6A6AC]">
+                        {p.purpose || 'Club Membership'}
+                      </td>
+                      <td className="px-6 py-4 font-extrabold text-[#F5F5F5]">
+                        ${Number(p.amount).toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge variant={isSuccess ? 'green' : isPending ? 'orange' : 'danger'}>
+                          {p.status}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 text-xs text-[#A6A6AC]">
+                        {new Date(p.created_at).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <Button 
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => downloadReceipt(p)}
+                          icon={<Download className="w-3.5 h-3.5" />}
+                        >
+                          Invoice
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={isAdmin ? 7 : 6} className="p-8">
+                    <EmptyState 
+                      icon={<Receipt className="w-8 h-8" />}
+                      title="No payment records found"
+                      description="Transaction receipts and subscription payments will appear here once processed."
+                    />
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

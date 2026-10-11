@@ -5,11 +5,14 @@ import { toast } from 'sonner';
 import { 
   Bell, 
   CheckCircle2, 
-  CheckCheck,
-  Loader2, 
-  Clock,
-  Info
+  CheckCheck, 
+  Clock, 
+  Info 
 } from 'lucide-react';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 export default function NotificationsPage() {
   const { profile } = useAuth();
@@ -55,93 +58,113 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-            <div className="relative">
-              <Bell className="w-8 h-8 text-primary" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground ring-2 ring-background">
-                  {unreadCount > 99 ? '99+' : unreadCount}
-                </span>
-              )}
-            </div>
-            Notifications
-          </h1>
-          <p className="text-muted-foreground mt-1">Stay updated with your latest alerts and messages.</p>
-        </div>
-        
-        {unreadCount > 0 && (
-          <button 
-            onClick={() => markAllReadMutation.mutate()} 
-            disabled={markAllReadMutation.isPending} 
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-muted/50 hover:bg-muted text-foreground border border-border rounded-lg font-medium text-sm transition-colors shadow-sm disabled:opacity-50"
-          >
-            {markAllReadMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCheck className="w-4 h-4" />}
-            Mark all as read
-          </button>
-        )}
-      </div>
+      <PageHeader 
+        title="Club Notifications" 
+        description="Live updates on court reservations, tournament invites, and account alerts."
+        badge={
+          unreadCount > 0 ? (
+            <Badge variant="orange" size="md">
+              {unreadCount} Unread
+            </Badge>
+          ) : (
+            <Badge variant="green" size="md">
+              All Caught Up
+            </Badge>
+          )
+        }
+        actions={
+          unreadCount > 0 && (
+            <Button 
+              variant="secondary"
+              size="sm"
+              isLoading={markAllReadMutation.isPending}
+              onClick={() => markAllReadMutation.mutate()}
+              icon={<CheckCheck className="w-4 h-4" />}
+            >
+              Mark All as Read
+            </Button>
+          )
+        }
+      />
 
-      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-[#121212] border border-[#242424] rounded-[26px] shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-            <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-            <p>Loading notifications...</p>
+          <div className="flex flex-col items-center justify-center py-20 text-[#A6A6AC]">
+            <div className="w-8 h-8 border-2 border-[#FF4B16] border-t-transparent rounded-full animate-spin mb-2" />
+            <span className="text-xs">Loading notifications...</span>
           </div>
-        ) : (
-          <div className="divide-y divide-border">
-            {notifications?.map((n: any) => (
-              <div 
-                key={n.id} 
-                className={`p-6 transition-all duration-300 relative ${n.is_read ? 'bg-background hover:bg-muted/30' : 'bg-primary/5 hover:bg-primary/10'}`}
-              >
-                {!n.is_read && (
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
-                )}
-                <div className="flex justify-between items-start gap-4">
-                  <div className="flex items-start gap-4">
-                    <div className={`mt-1 shrink-0 p-2 rounded-full ${n.is_read ? 'bg-muted text-muted-foreground' : 'bg-primary/20 text-primary'}`}>
+        ) : notifications && notifications.length > 0 ? (
+          <div className="divide-y divide-[#1E1E1E]">
+            {notifications.map((n: any) => {
+              const isUnread = !n.is_read;
+
+              return (
+                <div 
+                  key={n.id} 
+                  className={`p-6 transition-all duration-200 relative flex items-start justify-between gap-4 ${
+                    isUnread ? 'bg-[#181818]/90 hover:bg-[#1C1C1C]' : 'bg-[#121212] hover:bg-[#161616]'
+                  }`}
+                >
+                  {isUnread && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#FF4B16]" />
+                  )}
+                  
+                  <div className="flex items-start gap-4 min-w-0">
+                    <div className={`mt-0.5 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                      isUnread 
+                        ? 'bg-[#FF4B16]/15 border border-[#FF4B16]/30 text-[#FF4B16]' 
+                        : 'bg-[#1E1E1E] text-[#A6A6AC] border border-[#282828]'
+                    }`}>
                       <Info className="w-5 h-5" />
                     </div>
-                    <div>
-                      <h3 className={`font-semibold text-lg ${n.is_read ? 'text-foreground' : 'text-foreground'}`}>
-                        {n.title}
-                      </h3>
-                      <p className={`mt-1 leading-relaxed ${n.is_read ? 'text-muted-foreground' : 'text-foreground/90 font-medium'}`}>
+
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className={`text-base font-bold truncate ${isUnread ? 'text-[#F5F5F5]' : 'text-[#CCCCCC]'}`}>
+                          {n.title}
+                        </h4>
+                        {isUnread && (
+                          <span className="w-2 h-2 rounded-full bg-[#FF4B16] shrink-0" />
+                        )}
+                      </div>
+
+                      <p className={`text-xs mt-1 leading-relaxed ${isUnread ? 'text-[#F5F5F5]/90 font-medium' : 'text-[#A6A6AC]'}`}>
                         {n.message}
                       </p>
-                      <div className="flex items-center gap-2 mt-3 text-xs font-medium text-muted-foreground">
+
+                      <div className="flex items-center gap-1.5 mt-3 text-[11px] font-semibold text-[#777777]">
                         <Clock className="w-3.5 h-3.5" />
-                        {new Date(n.created_at).toLocaleString(undefined, {
-                          weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
-                        })}
+                        <span>
+                          {new Date(n.created_at).toLocaleDateString(undefined, {
+                            weekday: 'short',
+                            month: 'short',
+                            day: 'numeric'
+                          })} at {new Date(n.created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                        </span>
                       </div>
                     </div>
                   </div>
-                  {!n.is_read && (
+
+                  {isUnread && (
                     <button 
-                      onClick={() => markReadMutation.mutate(n.id)} 
+                      onClick={() => markReadMutation.mutate(n.id)}
                       disabled={markReadMutation.isPending}
-                      className="shrink-0 p-2 text-muted-foreground hover:text-success hover:bg-success/10 rounded-full transition-colors"
+                      className="p-2 rounded-xl text-[#A6A6AC] hover:text-[#079C68] hover:bg-[#079C68]/10 border border-transparent hover:border-[#079C68]/20 transition-all shrink-0 cursor-pointer"
                       title="Mark as read"
                     >
-                      <CheckCircle2 className="w-5 h-5" />
+                      <CheckCircle2 className="w-4 h-4" />
                     </button>
                   )}
                 </div>
-              </div>
-            ))}
-            {notifications?.length === 0 && (
-              <div className="flex flex-col items-center justify-center p-16 text-center">
-                <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mb-4">
-                  <Bell className="w-8 h-8 text-muted-foreground/50" />
-                </div>
-                <h3 className="text-lg font-medium text-foreground mb-1">You're all caught up!</h3>
-                <p className="text-muted-foreground">You don't have any notifications at the moment.</p>
-              </div>
-            )}
+              );
+            })}
           </div>
+        ) : (
+          <EmptyState 
+            icon={<Bell className="w-8 h-8" />}
+            title="You're All Caught Up"
+            description="You have no notifications or alerts at the moment. We'll alert you here when new events occur."
+          />
         )}
       </div>
     </div>

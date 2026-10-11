@@ -12,8 +12,14 @@ import {
   AlertTriangle,
   Loader2,
   X,
-  History
+  History,
+  PackageCheck
 } from 'lucide-react';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { Modal } from '@/components/ui/Modal';
 
 export default function EquipmentInventory() {
   const { session } = useAuth();
@@ -71,7 +77,7 @@ export default function EquipmentInventory() {
         })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) throw new Error(data.error || 'Failed to checkout gear');
       return data;
     },
     onSuccess: () => {
@@ -99,7 +105,7 @@ export default function EquipmentInventory() {
         })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) throw new Error(data.error || 'Failed to return gear');
       return data;
     },
     onSuccess: () => {
@@ -112,284 +118,280 @@ export default function EquipmentInventory() {
     onError: (err: any) => toast.error(err.message)
   });
 
-  const selectedEquipment = equipment?.find((e: any) => e.id === issueEqId);
-  const selectedTx = transactions?.find((tx: any) => tx.id === returnTxId);
+  const selectedEq = equipment?.find(e => e.id === issueEqId);
 
   return (
     <div className="space-y-8">
+      <PageHeader 
+        title="Equipment & Gear Inventory" 
+        description="Track sports rackets, balls, protective gear, and monitor athlete loan checkouts."
+      />
+
+      {/* Equipment Items Grid */}
       <div>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Equipment Inventory</h1>
-            <p className="text-muted-foreground mt-1">Manage club equipment, issue items, and track returns.</p>
-          </div>
-        </div>
-        
+        <h3 className="text-lg font-bold text-[#F5F5F5] mb-4 flex items-center gap-2">
+          <Dumbbell className="w-5 h-5 text-[#FF4B16]" /> Gear Stock Availability
+        </h3>
+
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-12 text-muted-foreground bg-card rounded-xl border border-border">
-            <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-            <p>Loading inventory...</p>
+          <div className="flex flex-col items-center justify-center py-16 text-[#A6A6AC]">
+            <div className="w-8 h-8 border-2 border-[#FF4B16] border-t-transparent rounded-full animate-spin mb-2" />
+            <span className="text-xs">Loading gear inventory...</span>
           </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {equipment?.map((item: any) => {
-              const outOfStock = item.available_quantity === 0;
-              const lowStock = !outOfStock && item.available_quantity <= Math.ceil(item.total_quantity * 0.2);
-              
+        ) : equipment && equipment.length > 0 ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {equipment.map((item: any) => {
+              const available = item.available_quantity;
+              const total = item.total_quantity;
+              const pct = total > 0 ? (available / total) * 100 : 0;
+              const isLow = available <= 2;
+
               return (
-                <div key={item.id} className="relative flex flex-col p-5 bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                      <Dumbbell className="w-5 h-5" />
+                <div 
+                  key={item.id} 
+                  className="bg-[#121212] rounded-[26px] border border-[#242424] hover:border-[#383838] p-6 shadow-sm flex flex-col justify-between transition-all"
+                >
+                  <div>
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h4 className="font-extrabold text-base text-[#F5F5F5]">{item.name}</h4>
+                        <span className="text-xs text-[#A6A6AC] capitalize">{item.category || 'General Sports Gear'}</span>
+                      </div>
+                      <Badge variant={available > 0 ? (isLow ? 'orange' : 'green') : 'danger'}>
+                        {available > 0 ? `${available} In Stock` : 'Out of Stock'}
+                      </Badge>
                     </div>
-                    {outOfStock ? (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive border border-destructive/20">
-                        Out of Stock
-                      </span>
-                    ) : lowStock ? (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-warning/10 text-warning border border-warning/20">
-                        Low Stock
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-success/10 text-success border border-success/20">
-                        In Stock
-                      </span>
-                    )}
+
+                    {/* Stock Bar */}
+                    <div className="my-4">
+                      <div className="flex justify-between text-xs text-[#A6A6AC] mb-1.5 font-medium">
+                        <span>Availability</span>
+                        <span className="font-mono text-[#F5F5F5] font-bold">{available} / {total}</span>
+                      </div>
+                      <div className="w-full h-2 rounded-full bg-[#1F1F1F] overflow-hidden">
+                        <div 
+                          className={`h-full rounded-full transition-all duration-300 ${
+                            available === 0 ? 'bg-[#E63946]' : isLow ? 'bg-[#FF4B16]' : 'bg-[#079C68]'
+                          }`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-[#A6A6AC] mb-6 flex items-center justify-between">
+                      <span>Condition standard:</span>
+                      <span className="capitalize font-semibold text-[#F5F5F5]">{item.condition || 'Good'}</span>
+                    </div>
                   </div>
-                  
-                  <h3 className="font-semibold text-lg text-foreground line-clamp-1" title={item.name}>{item.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-5 line-clamp-1">
-                    {item.category} {item.identifier ? `• ID: ${item.identifier}` : ''}
-                  </p>
-                  
-                  <div className="grid grid-cols-2 gap-2 mb-6 mt-auto">
-                    <div className="flex flex-col p-2 bg-muted/40 rounded-lg border border-border/50 text-center">
-                      <span className="text-xs font-medium text-muted-foreground mb-0.5">Available</span>
-                      <span className={`text-lg font-bold ${outOfStock ? 'text-destructive' : 'text-foreground'}`}>
-                        {item.available_quantity}
-                      </span>
-                    </div>
-                    <div className="flex flex-col p-2 bg-muted/40 rounded-lg border border-border/50 text-center">
-                      <span className="text-xs font-medium text-muted-foreground mb-0.5">Total</span>
-                      <span className="text-lg font-bold text-foreground">{item.total_quantity}</span>
-                    </div>
-                  </div>
-                  
-                  <button 
+
+                  <Button 
+                    variant="primary"
+                    size="sm"
+                    className="w-full"
+                    disabled={available === 0}
                     onClick={() => {
                       setIssueEqId(item.id);
-                      setReturnTxId(null);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      setIssueQty(1);
                     }}
-                    disabled={outOfStock}
-                    className="w-full flex items-center justify-center gap-2 py-2 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:hover:bg-primary/10"
+                    icon={<ArrowRightLeft className="w-3.5 h-3.5" />}
                   >
-                    <ArrowRightLeft className="w-4 h-4" /> Issue Item
-                  </button>
+                    Checkout Gear
+                  </Button>
                 </div>
               );
             })}
-            
-            {equipment?.length === 0 && (
-              <div className="col-span-full p-12 text-center border border-dashed border-border rounded-xl bg-muted/10">
-                <Dumbbell className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-1">No equipment found</h3>
-                <p className="text-muted-foreground">Add items to your inventory to start tracking.</p>
-              </div>
-            )}
           </div>
+        ) : (
+          <EmptyState 
+            icon={<Dumbbell className="w-8 h-8" />}
+            title="No Equipment Logged"
+            description="Add athletic gear, balls, protective equipment, and scoreboards to track inventory."
+          />
         )}
       </div>
 
-      {issueEqId && selectedEquipment && (
-        <div className="bg-card rounded-xl border border-primary/30 shadow-md overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 relative z-10">
-          <div className="px-6 py-4 border-b border-border bg-primary/5 flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <ArrowRightLeft className="w-5 h-5 text-primary" /> Issue: {selectedEquipment.name}
-            </h2>
-            <button onClick={() => setIssueEqId(null)} className="text-muted-foreground hover:text-foreground transition-colors p-1">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="p-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Quantity to Issue</label>
-                <input 
-                  type="number" 
-                  min="1" 
-                  max={selectedEquipment.available_quantity}
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors" 
-                  value={issueQty} 
-                  onChange={e => setIssueQty(Number(e.target.value))} 
-                />
-                <p className="text-xs text-muted-foreground">Max available: {selectedEquipment.available_quantity}</p>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <User className="w-4 h-4 text-muted-foreground" /> Member (Optional)
-                </label>
-                <select 
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors appearance-none" 
-                  value={issueMemberId} 
-                  onChange={e => setIssueMemberId(e.target.value)}
-                >
-                  <option value="">No member / Coach use</option>
-                  {members?.map((m: any) => <option key={m.id} value={m.id}>{m.profiles?.full_name}</option>)}
-                </select>
-              </div>
-            </div>
-            <div className="mt-6 pt-6 border-t border-border flex justify-end gap-3">
-              <button onClick={() => setIssueEqId(null)} className="px-4 py-2 border border-border bg-background text-foreground rounded-lg font-medium text-sm hover:bg-muted transition-colors">
-                Cancel
-              </button>
-              <button 
-                onClick={() => issueMutation.mutate()} 
-                disabled={issueMutation.isPending || issueQty < 1 || issueQty > selectedEquipment.available_quantity} 
-                className="inline-flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
-              >
-                {issueMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                {issueMutation.isPending ? 'Processing...' : 'Confirm Issue'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Checkout Logs History Table */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-bold text-[#F5F5F5] flex items-center gap-2">
+          <History className="w-5 h-5 text-[#5035E8]" /> Active Loan & Checkout Logs
+        </h3>
 
-      {returnTxId && selectedTx && (
-        <div className="bg-card rounded-xl border border-warning/50 shadow-md overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 relative z-10">
-          <div className="px-6 py-4 border-b border-border bg-warning/10 flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <RotateCcw className="w-5 h-5 text-warning" /> Return: {selectedTx.equipment?.name}
-            </h2>
-            <button onClick={() => setReturnTxId(null)} className="text-muted-foreground hover:text-foreground transition-colors p-1">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="p-6">
-            <div className="bg-muted/30 p-4 rounded-lg border border-border mb-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div><span className="text-muted-foreground block text-xs">Borrower</span><span className="font-medium text-foreground">{selectedTx.members?.profiles?.full_name || 'Coach'}</span></div>
-                <div><span className="text-muted-foreground block text-xs">Quantity</span><span className="font-medium text-foreground">{selectedTx.quantity}</span></div>
-                <div><span className="text-muted-foreground block text-xs">Issue Date</span><span className="font-medium text-foreground">{new Date(selectedTx.issue_date).toLocaleDateString()}</span></div>
-              </div>
-            </div>
-            
-            <div className="max-w-md">
-              <label className="block text-sm font-medium text-foreground mb-2">Condition at Return</label>
-              <select 
-                className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors appearance-none" 
-                value={returnCondition} 
-                onChange={e => setReturnCondition(e.target.value)}
-              >
-                <option value="good">Good (No new damage)</option>
-                <option value="fair">Fair (Normal Wear & Tear)</option>
-                <option value="damaged">Damaged (Requires Repair)</option>
-                <option value="lost">Lost / Not Returned</option>
-              </select>
-            </div>
-            
-            <div className="mt-6 pt-6 border-t border-border flex justify-end gap-3">
-              <button onClick={() => setReturnTxId(null)} className="px-4 py-2 border border-border bg-background text-foreground rounded-lg font-medium text-sm hover:bg-muted transition-colors">
-                Cancel
-              </button>
-              <button 
-                onClick={() => returnMutation.mutate()} 
-                disabled={returnMutation.isPending} 
-                className="inline-flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
-              >
-                {returnMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                {returnMutation.isPending ? 'Processing...' : 'Confirm Return'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div>
-        <div className="flex items-center gap-2 mb-4">
-          <History className="w-5 h-5 text-muted-foreground" />
-          <h2 className="text-xl font-bold tracking-tight text-foreground">Transaction History</h2>
-        </div>
-        
-        <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-[#121212] border border-[#242424] rounded-[24px] shadow-sm overflow-hidden flex flex-col">
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-muted/50 text-muted-foreground border-b border-border">
+              <thead className="bg-[#0A0A0A] text-[#A6A6AC] border-b border-[#242424]">
                 <tr>
-                  <th className="px-6 py-4 font-medium">Item</th>
-                  <th className="px-6 py-4 font-medium">Borrower</th>
-                  <th className="px-6 py-4 font-medium">Qty</th>
-                  <th className="px-6 py-4 font-medium">Issue Date</th>
-                  <th className="px-6 py-4 font-medium">Status</th>
-                  <th className="px-6 py-4 font-medium text-right">Actions</th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Equipment Item</th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Member / Borrower</th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Quantity</th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Checkout Date</th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-[#1E1E1E]">
                 {txLoading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                    <td colSpan={6} className="px-6 py-12 text-center text-[#A6A6AC]">
                       <div className="flex flex-col items-center justify-center gap-2">
-                        <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                        <span>Loading transactions...</span>
+                        <div className="w-6 h-6 border-2 border-[#FF4B16] border-t-transparent rounded-full animate-spin" />
+                        <span className="text-xs">Loading transaction logs...</span>
                       </div>
                     </td>
                   </tr>
-                ) : transactions?.length === 0 ? (
+                ) : transactions && transactions.length > 0 ? (
+                  transactions.map((tx: any) => {
+                    const isReturned = !!tx.return_date;
+
+                    return (
+                      <tr key={tx.id} className="hover:bg-[#181818] transition-colors">
+                        <td className="px-6 py-4 font-bold text-[#F5F5F5]">
+                          {tx.equipment?.name || 'Equipment Item'}
+                        </td>
+                        <td className="px-6 py-4 text-xs text-[#A6A6AC]">
+                          {tx.members?.profiles?.full_name || 'Anonymous Club Loan'}
+                        </td>
+                        <td className="px-6 py-4 font-mono font-bold text-xs text-[#F5F5F5]">
+                          {tx.quantity} pcs
+                        </td>
+                        <td className="px-6 py-4 text-xs text-[#A6A6AC]">
+                          {new Date(tx.issue_date).toLocaleDateString(undefined, {
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </td>
+                        <td className="px-6 py-4">
+                          <Badge variant={isReturned ? 'green' : 'orange'}>
+                            {isReturned ? 'Returned' : 'Checked Out'}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {!isReturned ? (
+                            <Button 
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => setReturnTxId(tx.id)}
+                              icon={<RotateCcw className="w-3.5 h-3.5" />}
+                            >
+                              Return
+                            </Button>
+                          ) : (
+                            <span className="text-xs text-[#555555]">Completed</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
                   <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
-                      No transaction history found.
+                    <td colSpan={6} className="p-8 text-center text-xs text-[#A6A6AC]">
+                      No active equipment checkout records found.
                     </td>
                   </tr>
-                ) : (
-                  transactions?.map((tx: any) => (
-                    <tr key={tx.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-6 py-4 font-medium text-foreground">{tx.equipment?.name}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <User className="w-4 h-4 text-muted-foreground" />
-                          <span className="text-foreground">{tx.members?.profiles?.full_name || 'Coach'}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-foreground">{tx.quantity}</td>
-                      <td className="px-6 py-4 text-muted-foreground">
-                        {new Date(tx.issue_date).toLocaleDateString(undefined, {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric'
-                        })}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border
-                          ${tx.status === 'returned' ? 'bg-success/10 text-success border-success/20' : 'bg-warning/10 text-warning border-warning/20'}`}>
-                          {tx.status === 'returned' ? <CheckCircle2 className="w-3 h-3 mr-1.5" /> : <AlertTriangle className="w-3 h-3 mr-1.5" />}
-                          <span className="capitalize">{tx.status}</span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        {tx.status === 'issued' ? (
-                          <button 
-                            onClick={() => {
-                              setReturnTxId(tx.id);
-                              setIssueEqId(null);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }} 
-                            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-md transition-colors"
-                          >
-                            <RotateCcw className="w-3.5 h-3.5" /> Return
-                          </button>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">Returned</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))
                 )}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+
+      {/* Checkout Issue Modal */}
+      <Modal
+        isOpen={!!issueEqId}
+        onClose={() => setIssueEqId(null)}
+        title={`Checkout: ${selectedEq?.name || 'Equipment'}`}
+        description="Record gear loan to an active athlete or club member."
+      >
+        <div className="space-y-4 pt-2">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Member Account</label>
+            <div className="relative">
+              <select 
+                value={issueMemberId}
+                onChange={(e) => setIssueMemberId(e.target.value)}
+                className="w-full px-4 py-2.5 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] appearance-none"
+              >
+                <option value="">General Club Checkout (No Member Assigned)</option>
+                {members?.map((m: any) => (
+                  <option key={m.id} value={m.id}>{m.profiles?.full_name}</option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#A6A6AC]">
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                  <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">
+              Quantity (Max: {selectedEq?.available_quantity || 1})
+            </label>
+            <input 
+              type="number" 
+              min={1} 
+              max={selectedEq?.available_quantity || 1}
+              value={issueQty}
+              onChange={(e) => setIssueQty(Math.max(1, Number(e.target.value)))}
+              className="w-full px-4 py-2.5 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16]"
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-[#1E1E1E]">
+            <Button variant="secondary" onClick={() => setIssueEqId(null)}>Cancel</Button>
+            <Button 
+              variant="primary" 
+              isLoading={issueMutation.isPending}
+              onClick={() => issueMutation.mutate()}
+            >
+              Confirm Checkout
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Return Modal */}
+      <Modal
+        isOpen={!!returnTxId}
+        onClose={() => setReturnTxId(null)}
+        title="Process Equipment Return"
+        description="Inspect returned condition and restore item quantity back to stock."
+      >
+        <div className="space-y-4 pt-2">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Returned Condition</label>
+            <div className="relative">
+              <select 
+                value={returnCondition}
+                onChange={(e) => setReturnCondition(e.target.value)}
+                className="w-full px-4 py-2.5 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] appearance-none"
+              >
+                <option value="good">Good (Normal Condition)</option>
+                <option value="fair">Fair (Minor Wear)</option>
+                <option value="damaged">Damaged (Needs Repair)</option>
+                <option value="lost">Lost / Unreturned</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#A6A6AC]">
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                  <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-[#1E1E1E]">
+            <Button variant="secondary" onClick={() => setReturnTxId(null)}>Cancel</Button>
+            <Button 
+              variant="primary" 
+              isLoading={returnMutation.isPending}
+              onClick={() => returnMutation.mutate()}
+            >
+              Verify & Return to Stock
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

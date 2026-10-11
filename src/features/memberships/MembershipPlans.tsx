@@ -5,7 +5,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { Plus, Clock, CreditCard, X, Loader2, CheckCircle2 } from 'lucide-react';
+import { Plus, Clock, CreditCard, X, CheckCircle2, Edit3 } from 'lucide-react';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 const planSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -79,180 +83,204 @@ export default function MembershipPlans() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Membership Plans</h1>
-          <p className="text-muted-foreground mt-1">Create and manage subscription tiers for your members.</p>
-        </div>
-        {!isFormOpen && (
-          <button 
-            onClick={() => openForm()}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Add Plan
-          </button>
-        )}
-      </div>
+      <PageHeader 
+        title="Membership Tiers" 
+        description="Configure subscription plans, billing durations, access privileges, and pricing tiers."
+        actions={
+          !isFormOpen && (
+            <Button 
+              variant="primary"
+              onClick={() => openForm()}
+              icon={<Plus className="w-4 h-4" />}
+            >
+              Add New Plan
+            </Button>
+          )
+        }
+      />
 
+      {/* Create / Edit Plan Drawer Form */}
       {isFormOpen && (
-        <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="px-6 py-4 border-b border-border bg-muted/20 flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-foreground">{editingId ? 'Edit Membership Plan' : 'Create New Plan'}</h2>
-            <button onClick={closeForm} className="text-muted-foreground hover:text-foreground transition-colors p-1">
+        <div className="bg-[#121212] rounded-[26px] border border-[#242424] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 mb-8">
+          <div className="px-7 py-5 border-b border-[#1E1E1E] bg-[#161616] flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#FF4B16]/15 border border-[#FF4B16]/30 flex items-center justify-center text-[#FF4B16]">
+                <CreditCard className="w-4 h-4" />
+              </div>
+              <h2 className="text-lg font-bold text-[#F5F5F5]">
+                {editingId ? 'Edit Membership Tier' : 'Create New Membership Tier'}
+              </h2>
+            </div>
+            <button 
+              onClick={closeForm} 
+              className="p-2 rounded-xl text-[#A6A6AC] hover:text-[#F5F5F5] hover:bg-[#242424] transition-colors cursor-pointer"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
           
-          <form onSubmit={handleSubmit((data) => saveMutation.mutate(data))} className="p-6">
+          <form onSubmit={handleSubmit((data) => saveMutation.mutate(data))} className="p-7">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-foreground">Plan Name</label>
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Plan Name *</label>
                 <input 
                   {...register('name')} 
-                  placeholder="e.g., Premium Annual, Basic Monthly"
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors" 
+                  placeholder="e.g. VIP Gold Annual, Student Monthly"
+                  className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all placeholder:text-[#555555]" 
                 />
-                {errors.name && <p className="text-destructive text-sm mt-1">{errors.name.message}</p>}
+                {errors.name && <p className="text-[#E63946] text-xs mt-1">{errors.name.message}</p>}
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-muted-foreground" /> Duration (Months)
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-[#FF4B16]" /> Duration (Months) *
                 </label>
                 <input 
                   type="number" 
                   {...register('duration_months', { valueAsNumber: true })} 
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors" 
+                  className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all" 
                 />
-                {errors.duration_months && <p className="text-destructive text-sm mt-1">{errors.duration_months.message}</p>}
+                {errors.duration_months && <p className="text-[#E63946] text-xs mt-1">{errors.duration_months.message}</p>}
               </div>
               
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-muted-foreground" /> Fee ($)
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-[#079C68]" /> Price Fee ($) *
                 </label>
                 <input 
                   type="number" 
                   step="0.01" 
                   {...register('fee', { valueAsNumber: true })} 
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors" 
+                  className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all" 
                 />
-                {errors.fee && <p className="text-destructive text-sm mt-1">{errors.fee.message}</p>}
+                {errors.fee && <p className="text-[#E63946] text-xs mt-1">{errors.fee.message}</p>}
               </div>
               
               <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-foreground">Description</label>
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Tier Privileges & Benefits</label>
                 <textarea 
                   {...register('description')} 
-                  placeholder="Describe the benefits of this plan..."
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors h-24 resize-none" 
+                  placeholder="Outline facility access, guest passes, discounts, and training hours included in this tier..."
+                  className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all h-24 resize-none placeholder:text-[#555555]" 
                 />
               </div>
               
-              <div className="md:col-span-2 flex items-center p-4 bg-muted/30 border border-border/50 rounded-lg">
+              <div className="md:col-span-2 flex items-center p-4 bg-[#181818] border border-[#262626] rounded-2xl">
                 <input 
                   type="checkbox" 
                   {...register('is_active')} 
                   id="is_active" 
-                  className="w-4 h-4 text-primary rounded border-border focus:ring-primary accent-primary" 
+                  className="w-4 h-4 rounded border-[#333333] accent-[#FF4B16] cursor-pointer" 
                 />
-                <div className="ml-3">
-                  <label htmlFor="is_active" className="text-sm font-medium text-foreground cursor-pointer">Active Status</label>
-                  <p className="text-xs text-muted-foreground">If active, this plan is available for new subscriptions.</p>
+                <div className="ml-3 cursor-pointer" onClick={() => {}}>
+                  <label htmlFor="is_active" className="text-sm font-bold text-[#F5F5F5] cursor-pointer">Active Tier</label>
+                  <p className="text-xs text-[#A6A6AC]">Active plans are visible to new signups and renewal workflows.</p>
                 </div>
               </div>
             </div>
             
-            <div className="mt-6 pt-6 border-t border-border flex justify-end gap-3">
-              <button 
+            <div className="mt-8 pt-6 border-t border-[#1E1E1E] flex justify-end gap-3">
+              <Button 
                 type="button" 
-                onClick={closeForm} 
-                className="px-4 py-2 border border-border bg-background text-foreground rounded-lg font-medium text-sm hover:bg-muted transition-colors"
+                variant="secondary"
+                onClick={closeForm}
               >
                 Cancel
-              </button>
-              <button 
+              </Button>
+              <Button 
                 type="submit" 
-                disabled={saveMutation.isPending} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
+                variant="primary"
+                isLoading={saveMutation.isPending}
               >
-                {saveMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                {saveMutation.isPending ? 'Saving...' : 'Save Plan'}
-              </button>
+                {saveMutation.isPending ? 'Saving...' : editingId ? 'Update Tier' : 'Create Tier'}
+              </Button>
             </div>
           </form>
         </div>
       )}
 
+      {/* Plans Grid */}
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center p-12 text-muted-foreground">
-          <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-          <p>Loading plans...</p>
+        <div className="flex flex-col items-center justify-center py-20 text-[#A6A6AC]">
+          <div className="w-9 h-9 border-2 border-[#FF4B16] border-t-transparent rounded-full animate-spin mb-3" />
+          <p className="text-sm">Loading membership plans...</p>
         </div>
-      ) : (
+      ) : plans && plans.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {plans?.map((plan) => (
+          {plans.map((plan) => (
             <div 
               key={plan.id} 
               className={`
-                relative flex flex-col p-6 bg-card rounded-2xl border shadow-sm transition-all duration-200 hover:shadow-md
-                ${!plan.is_active ? 'opacity-75 grayscale-[0.2]' : ''}
+                relative flex flex-col p-7 bg-[#121212] rounded-[26px] border shadow-sm transition-all duration-200 hover:border-[#383838] hover:-translate-y-1
+                ${plan.is_active ? 'border-[#242424]' : 'border-[#1E1E1E] opacity-75'}
               `}
             >
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="font-bold text-xl text-foreground">{plan.name}</h3>
-                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border
-                  ${plan.is_active ? 'bg-success/10 text-success border-success/20' : 'bg-muted text-muted-foreground border-border'}`}>
-                  {plan.is_active ? 'Active' : 'Inactive'}
-                </span>
+              <div className="flex justify-between items-start mb-5">
+                <div>
+                  <h3 className="font-extrabold text-xl text-[#F5F5F5] tracking-tight">{plan.name}</h3>
+                  <span className="text-xs text-[#A6A6AC] mt-0.5 block">{plan.duration_months} Month Subscription</span>
+                </div>
+                <Badge variant={plan.is_active ? 'green' : 'neutral'}>
+                  {plan.is_active ? 'Active' : 'Archived'}
+                </Badge>
               </div>
               
-              <div className="mb-6">
-                <span className="text-4xl font-extrabold text-foreground">${plan.fee}</span>
-                <span className="text-muted-foreground ml-1">/ {plan.duration_months > 1 ? `${plan.duration_months} mos` : 'mo'}</span>
+              <div className="mb-6 p-4 rounded-2xl bg-[#181818] border border-[#262626]">
+                <div className="flex items-baseline">
+                  <span className="text-4xl font-extrabold text-[#F5F5F5] tracking-tight">${plan.fee}</span>
+                  <span className="text-xs text-[#A6A6AC] font-semibold ml-1.5">
+                    / {plan.duration_months > 1 ? `${plan.duration_months} months` : 'month'}
+                  </span>
+                </div>
               </div>
               
               <div className="flex-1 space-y-4 mb-8">
-                <div className="text-sm text-muted-foreground leading-relaxed">
-                  {plan.description || "No description provided."}
-                </div>
+                <p className="text-xs text-[#A6A6AC] leading-relaxed min-h-[40px]">
+                  {plan.description || "Full club privileges and facilities reservation access."}
+                </p>
                 
-                <div className="space-y-2 pt-4 border-t border-border/50">
-                  <div className="flex items-center text-sm text-foreground">
-                    <CheckCircle2 className="w-4 h-4 text-primary mr-2" />
-                    Valid for {plan.duration_months} month(s)
+                <div className="space-y-2.5 pt-4 border-t border-[#1E1E1E]">
+                  <div className="flex items-center text-xs text-[#F5F5F5] font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#079C68] mr-2.5 shrink-0" />
+                    Valid for {plan.duration_months} continuous month(s)
                   </div>
-                  <div className="flex items-center text-sm text-foreground">
-                    <CheckCircle2 className="w-4 h-4 text-primary mr-2" />
-                    Access to club facilities
+                  <div className="flex items-center text-xs text-[#F5F5F5] font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#079C68] mr-2.5 shrink-0" />
+                    Priority court and lane reservations
+                  </div>
+                  <div className="flex items-center text-xs text-[#F5F5F5] font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#079C68] mr-2.5 shrink-0" />
+                    Member pricing on tournament entries
                   </div>
                 </div>
               </div>
               
-              <button 
+              <Button 
+                variant="secondary"
+                className="w-full"
                 onClick={() => openForm(plan)}
-                className="w-full py-2.5 border border-border bg-muted/30 text-foreground rounded-lg font-medium text-sm hover:bg-muted hover:border-border/80 transition-colors mt-auto"
+                icon={<Edit3 className="w-4 h-4" />}
               >
-                Edit Plan
-              </button>
+                Edit Tier Settings
+              </Button>
             </div>
           ))}
-          {plans?.length === 0 && (
-            <div className="col-span-full p-12 text-center border border-dashed border-border rounded-xl bg-muted/10">
-              <CreditCard className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-1">No plans available</h3>
-              <p className="text-muted-foreground mb-4">Create your first membership plan to get started.</p>
-              <button 
-                onClick={() => openForm()}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Add Plan
-              </button>
-            </div>
-          )}
         </div>
+      ) : (
+        <EmptyState 
+          icon={<CreditCard className="w-8 h-8" />}
+          title="No Membership Plans"
+          description="Create your first subscription tier to enable new member registrations and fee billing."
+          action={
+            <Button 
+              variant="primary" 
+              onClick={() => openForm()}
+              icon={<Plus className="w-4 h-4" />}
+            >
+              Add Membership Tier
+            </Button>
+          }
+        />
       )}
     </div>
   );

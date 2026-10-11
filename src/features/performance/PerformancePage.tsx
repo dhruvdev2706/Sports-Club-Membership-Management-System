@@ -6,16 +6,12 @@ import { toast } from 'sonner';
 import { 
   TrendingUp, 
   Activity, 
-  User, 
-  MessageSquare, 
   Target, 
-  Trophy, 
-  Award, 
-  Loader2, 
-  Calendar,
-  Save,
-  LineChart
+  Save 
 } from 'lucide-react';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 
 export default function PerformancePage() {
   const { profile } = useAuth();
@@ -23,14 +19,12 @@ export default function PerformancePage() {
   const queryClient = useQueryClient();
   
   const [selectedMemberId, setSelectedMemberId] = useState<string>('');
-  const [score, setScore] = useState<number>(50);
+  const [score, setScore] = useState<number>(75);
   const [notes, setNotes] = useState('');
 
   const { data: members } = useQuery({
     queryKey: ['performance_members'],
     queryFn: async () => {
-      // In a real app, a coach only sees members in their assigned batches.
-      // For demo, we let them see all active members.
       const { data, error } = await supabase.from('members').select('id, profiles(full_name)').eq('status', 'active');
       if (error) throw error;
       return data;
@@ -67,262 +61,199 @@ export default function PerformancePage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Evaluation recorded successfully');
+      toast.success('Performance evaluation recorded successfully');
       queryClient.invalidateQueries({ queryKey: ['evaluations'] });
-      setScore(50);
+      setScore(75);
       setNotes('');
     },
     onError: (err: any) => toast.error(err.message)
   });
 
-  const getScoreColor = (score: number) => {
-    if (score >= 85) return 'text-success bg-success/10 border-success/20';
-    if (score >= 65) return 'text-primary bg-primary/10 border-primary/20';
-    if (score >= 45) return 'text-warning bg-warning/10 border-warning/20';
-    return 'text-destructive bg-destructive/10 border-destructive/20';
+  const getScoreTier = (s: number) => {
+    if (s >= 85) return { label: 'Elite Mastery', badge: 'green' as const, color: '#079C68' };
+    if (s >= 65) return { label: 'Advanced', badge: 'purple' as const, color: '#5035E8' };
+    if (s >= 45) return { label: 'Intermediate', badge: 'orange' as const, color: '#FF4B16' };
+    return { label: 'Needs Focus', badge: 'danger' as const, color: '#E63946' };
   };
 
-  const getScoreBg = (score: number) => {
-    if (score >= 85) return 'bg-success';
-    if (score >= 65) return 'bg-primary';
-    if (score >= 45) return 'bg-warning';
-    return 'bg-destructive';
-  };
+  const currentTier = getScoreTier(score);
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-          <Activity className="w-8 h-8 text-primary" /> Performance Evaluations
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          {isAdminOrCoach 
-            ? 'Track and record member progress, skills, and overall performance.' 
-            : 'View your progress, coach feedback, and skill development over time.'}
-        </p>
-      </div>
+      <PageHeader 
+        title="Athletic Performance Evaluations" 
+        description={
+          isAdminOrCoach
+            ? 'Record skill assessments, evaluate technique mastery, and publish feedback notes.'
+            : 'Track coach evaluations, technical milestones, and overall athletic progression.'
+        }
+      />
 
-      {isAdminOrCoach && (
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1 space-y-6">
-            <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-border bg-muted/30">
-                <h2 className="font-semibold text-lg text-foreground flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-primary" /> Record Evaluation
-                </h2>
-              </div>
-              
-              <div className="p-6 space-y-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                    <User className="w-4 h-4 text-muted-foreground" /> Select Member
-                  </label>
-                  <select 
-                    className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors appearance-none cursor-pointer"
-                    value={selectedMemberId}
-                    onChange={e => setSelectedMemberId(e.target.value)}
-                  >
-                    <option value="">-- View All / Select Member --</option>
-                    {members?.map((m: any) => (
-                      <option key={m.id} value={m.id}>{m.profiles?.full_name}</option>
-                    ))}
-                  </select>
+      <div className="grid gap-6 lg:grid-cols-12">
+        {/* Coach Evaluation Input Form (if Coach or Admin) */}
+        {isAdminOrCoach && (
+          <div className="lg:col-span-5 bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-[#FF4B16]/15 border border-[#FF4B16]/30 flex items-center justify-center text-[#FF4B16]">
+                  <Target className="w-5 h-5" />
                 </div>
-                
-                {selectedMemberId && (
-                  <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                          <Target className="w-4 h-4 text-muted-foreground" /> Overall Score
-                        </label>
-                        <span className={`px-2.5 py-1 rounded-md text-xs font-bold border ${getScoreColor(score)}`}>
-                          {score} / 100
-                        </span>
-                      </div>
-                      
-                      <div className="relative pt-1">
-                        <input 
-                          type="range" 
-                          min="0" 
-                          max="100" 
-                          className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary" 
-                          value={score} 
-                          onChange={e => setScore(Number(e.target.value))} 
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                          <span>0</span>
-                          <span>Needs Work</span>
-                          <span>Good</span>
-                          <span>Excellent</span>
-                          <span>100</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                        <MessageSquare className="w-4 h-4 text-muted-foreground" /> Coaching Notes
-                      </label>
-                      <textarea 
-                        placeholder="Provide constructive feedback, areas of improvement, and achievements..."
-                        className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors h-32 resize-none" 
-                        value={notes} 
-                        onChange={e => setNotes(e.target.value)} 
-                      />
-                    </div>
-                    
-                    <button 
-                      onClick={() => addEvalMutation.mutate()}
-                      disabled={addEvalMutation.isPending || !notes.trim()}
-                      className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
+                <div>
+                  <h3 className="font-bold text-lg text-[#F5F5F5] tracking-tight">Record Evaluation</h3>
+                  <p className="text-xs text-[#A6A6AC]">Submit new performance scoring</p>
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Select Athlete *</label>
+                  <div className="relative">
+                    <select 
+                      value={selectedMemberId}
+                      onChange={(e) => setSelectedMemberId(e.target.value)}
+                      className="w-full px-4 py-2.5 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] appearance-none cursor-pointer"
                     >
-                      {addEvalMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                      {addEvalMutation.isPending ? 'Saving...' : 'Save Evaluation'}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          
-          <div className="lg:col-span-2">
-            <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
-              <div className="px-6 py-4 border-b border-border bg-muted/30 flex justify-between items-center">
-                <h2 className="font-semibold text-lg text-foreground flex items-center gap-2">
-                  <LineChart className="w-5 h-5 text-primary" /> Evaluation History
-                </h2>
-                {selectedMemberId && (
-                  <span className="text-sm font-medium px-3 py-1 bg-background border border-border rounded-full">
-                    Filtered by Member
-                  </span>
-                )}
-              </div>
-              
-              <div className="overflow-x-auto custom-scrollbar flex-1">
-                <table className="w-full text-left text-sm whitespace-nowrap">
-                  <thead className="bg-muted/50 text-muted-foreground border-b border-border">
-                    <tr>
-                      <th className="px-6 py-4 font-medium">Date</th>
-                      <th className="px-6 py-4 font-medium">Member</th>
-                      <th className="px-6 py-4 font-medium">Score</th>
-                      <th className="px-6 py-4 font-medium">Coach</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {isLoading ? (
-                      <tr>
-                        <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
-                          <div className="flex flex-col items-center justify-center gap-2">
-                            <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                            <span>Loading records...</span>
-                          </div>
-                        </td>
-                      </tr>
-                    ) : evaluations?.length === 0 ? (
-                      <tr>
-                        <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
-                          <div className="flex flex-col items-center justify-center gap-2">
-                            <Activity className="w-8 h-8 opacity-20" />
-                            <span>No evaluations found.</span>
-                          </div>
-                        </td>
-                      </tr>
-                    ) : (
-                      evaluations?.map((ev: any) => (
-                        <tr key={ev.id} className="hover:bg-muted/30 transition-colors">
-                          <td className="px-6 py-4 text-foreground flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-muted-foreground" />
-                            {new Date(ev.evaluation_date).toLocaleDateString(undefined, {
-                              year: 'numeric', month: 'short', day: 'numeric'
-                            })}
-                          </td>
-                          <td className="px-6 py-4 font-medium text-foreground">
-                            {ev.members?.profiles?.full_name}
-                          </td>
-                          <td className="px-6 py-4 w-48">
-                            <div className="flex items-center gap-3">
-                              <span className={`w-8 text-right font-bold text-xs ${getScoreColor(ev.score).split(' ')[0]}`}>
-                                {ev.score}
-                              </span>
-                              <div className="flex-1 bg-muted rounded-full h-2 overflow-hidden">
-                                <div className={`h-full rounded-full ${getScoreBg(ev.score)}`} style={{ width: `${ev.score}%` }}></div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 text-muted-foreground">
-                            {ev.coach?.full_name}
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {!isAdminOrCoach && (
-        <div className="space-y-6">
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-              <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-              <p>Loading your performance records...</p>
-            </div>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {evaluations?.map((ev: any) => (
-                <div key={ev.id} className="relative flex flex-col p-6 bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full border border-border/50">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {new Date(ev.evaluation_date).toLocaleDateString(undefined, {
-                        year: 'numeric', month: 'long', day: 'numeric'
-                      })}
+                      <option value="">Choose active member...</option>
+                      {members?.map((m: any) => (
+                        <option key={m.id} value={m.id}>{m.profiles?.full_name}</option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#A6A6AC]">
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                        <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                      </svg>
                     </div>
-                    
-                    {ev.score >= 90 && (
-                      <Trophy className="w-5 h-5 text-yellow-500" />
-                    )}
-                  </div>
-                  
-                  <div className="flex items-end gap-2 mb-6">
-                    <span className={`text-5xl font-extrabold tracking-tighter ${getScoreColor(ev.score).split(' ')[0]}`}>
-                      {ev.score}
-                    </span>
-                    <span className="text-lg text-muted-foreground font-medium mb-1">/100</span>
-                  </div>
-                  
-                  <div className="w-full bg-muted rounded-full h-1.5 mb-6 overflow-hidden">
-                    <div className={`h-full rounded-full ${getScoreBg(ev.score)}`} style={{ width: `${ev.score}%` }}></div>
-                  </div>
-                  
-                  <div className="flex-1 relative bg-muted/30 p-4 rounded-lg border border-border/50 mb-6">
-                    <MessageSquare className="w-4 h-4 text-muted-foreground absolute top-4 right-4 opacity-50" />
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Coach Feedback</h4>
-                    <p className="text-sm text-foreground leading-relaxed italic">"{ev.notes}"</p>
-                  </div>
-                  
-                  <div className="mt-auto pt-4 border-t border-border flex items-center gap-2 text-sm text-muted-foreground">
-                    <Award className="w-4 h-4" />
-                    Evaluated by <span className="font-medium text-foreground">{ev.coach?.full_name}</span>
                   </div>
                 </div>
-              ))}
-              
-              {evaluations?.length === 0 && (
-                <div className="col-span-full p-12 text-center border border-dashed border-border rounded-xl bg-muted/10">
-                  <Activity className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-foreground mb-1">No evaluations yet</h3>
-                  <p className="text-muted-foreground">Your performance records will appear here once your coach evaluates you.</p>
+
+                {/* Score Slider */}
+                <div className="space-y-3 p-4 rounded-2xl bg-[#181818] border border-[#262626]">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Performance Score</label>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-2xl font-black text-[#F5F5F5]">{score}</span>
+                      <span className="text-xs text-[#777777]">/ 100</span>
+                    </div>
+                  </div>
+
+                  <input 
+                    type="range" 
+                    min={0} 
+                    max={100}
+                    value={score}
+                    onChange={(e) => setScore(Number(e.target.value))}
+                    className="w-full h-2 bg-[#282828] rounded-lg appearance-none cursor-pointer accent-[#FF4B16]"
+                  />
+
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[11px] text-[#A6A6AC]">Rating Tier:</span>
+                    <Badge variant={currentTier.badge} size="sm">
+                      {currentTier.label}
+                    </Badge>
+                  </div>
                 </div>
-              )}
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Coach Review & Feedback</label>
+                  <textarea 
+                    rows={4}
+                    placeholder="Specific tactical strengths, footwork, endurance, areas for development..."
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] resize-none placeholder:text-[#555555]"
+                  />
+                </div>
+              </div>
             </div>
-          )}
+
+            <div className="mt-6 pt-5 border-t border-[#1E1E1E]">
+              <Button 
+                variant="primary"
+                className="w-full"
+                disabled={!selectedMemberId || addEvalMutation.isPending}
+                isLoading={addEvalMutation.isPending}
+                onClick={() => addEvalMutation.mutate()}
+                icon={<Save className="w-4 h-4" />}
+              >
+                Submit Performance Record
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Evaluations History Feed (7 or 12 Cols) */}
+        <div className={`${isAdminOrCoach ? 'lg:col-span-7' : 'lg:col-span-12'} bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-7 shadow-sm flex flex-col justify-between`}>
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#5035E8]/15 border border-[#5035E8]/30 flex items-center justify-center text-[#A594FF]">
+                  <Activity className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-[#F5F5F5] tracking-tight">Assessment History</h3>
+                  <p className="text-xs text-[#A6A6AC]">Verified coach scorecards</p>
+                </div>
+              </div>
+              <Badge variant="neutral" size="sm">
+                {evaluations?.length ?? 0} Records
+              </Badge>
+            </div>
+
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-16 text-[#A6A6AC]">
+                <div className="w-8 h-8 border-2 border-[#FF4B16] border-t-transparent rounded-full animate-spin mb-2" />
+                <span className="text-xs">Loading performance logs...</span>
+              </div>
+            ) : evaluations && evaluations.length > 0 ? (
+              <div className="space-y-4 max-h-[540px] overflow-y-auto custom-scrollbar pr-1">
+                {evaluations.map((ev: any) => {
+                  const tier = getScoreTier(ev.score);
+
+                  return (
+                    <div 
+                      key={ev.id} 
+                      className="p-5 rounded-2xl bg-[#181818] border border-[#262626] hover:border-[#383838] transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-[#0A0A0A] border border-[#282828] flex flex-col items-center justify-center shrink-0">
+                            <span className="font-mono text-lg font-black text-[#F5F5F5] leading-none">{ev.score}</span>
+                            <span className="text-[9px] uppercase font-bold text-[#A6A6AC] mt-0.5">pts</span>
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-sm text-[#F5F5F5]">
+                              {ev.members?.profiles?.full_name || 'Member'}
+                            </h4>
+                            <p className="text-[11px] text-[#A6A6AC] mt-0.5">
+                              Assessed by: Coach {ev.coach?.full_name || 'Staff'} • {new Date(ev.evaluation_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </p>
+                          </div>
+                        </div>
+
+                        <Badge variant={tier.badge} size="sm">
+                          {tier.label}
+                        </Badge>
+                      </div>
+
+                      {ev.notes && (
+                        <div className="p-3.5 rounded-xl bg-[#0E0E0E] border border-[#222222] text-xs text-[#A6A6AC] leading-relaxed mt-2 italic">
+                          "{ev.notes}"
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="py-16 text-center border border-dashed border-[#282828] rounded-2xl bg-[#161616]/50">
+                <TrendingUp className="w-8 h-8 text-[#555555] mx-auto mb-2" />
+                <p className="text-sm font-semibold text-[#F5F5F5]">No performance records yet</p>
+                <p className="text-xs text-[#A6A6AC] mt-1">Select an athlete and record a performance evaluation to begin tracking.</p>
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

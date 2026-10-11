@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Activity, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Activity, Eye, EyeOff } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 export default function UpdatePassword() {
   const [password, setPassword] = useState('');
@@ -11,10 +12,9 @@ export default function UpdatePassword() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Listen for auth state change
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event) => {
       if (event === 'PASSWORD_RECOVERY') {
-        // We are good to go, user clicked link.
+        // Recovery ready
       }
     });
     return () => {
@@ -30,90 +30,63 @@ export default function UpdatePassword() {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success('Password updated successfully');
+      toast.success('Your password has been updated securely');
       navigate('/');
     }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-background">
-      {/* Brand Panel - Left */}
-      <div className="hidden md:flex md:w-1/2 lg:w-5/12 bg-primary text-primary-foreground flex-col justify-between p-12 relative overflow-hidden">
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-16">
-            <div className="w-10 h-10 rounded-lg bg-accent text-accent-foreground flex items-center justify-center">
-              <Activity className="w-6 h-6" />
+    <div className="min-h-screen flex items-center justify-center bg-[#080808] text-[#F5F5F5] p-6">
+      <div className="w-full max-w-[420px] bg-[#121212] border border-[#242424] rounded-[28px] p-8 sm:p-10 shadow-2xl space-y-7">
+        
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-xl bg-[#FF4B16] text-[#111111] flex items-center justify-center font-bold shadow-md shadow-[#FF4B16]/20">
+              <Activity className="w-5 h-5 stroke-[2.5]" />
             </div>
-            <span className="text-xl font-bold tracking-tight">Apex Sports</span>
+            <span className="text-lg font-extrabold text-[#F5F5F5]">Apex Sports</span>
           </div>
-          <h1 className="text-4xl lg:text-5xl font-bold leading-tight mb-6">
-            Secure your account.
-          </h1>
-          <p className="text-lg text-primary-foreground/80 max-w-sm">
-            Create a new strong password to keep your profile and bookings safe.
+
+          <h2 className="text-2xl font-extrabold tracking-tight text-[#F5F5F5]">Set New Password</h2>
+          <p className="text-xs text-[#A6A6AC] mt-1.5 leading-relaxed">
+            Choose a strong password to protect your athlete account, bookings, and billing information.
           </p>
         </div>
-        
-        <div className="relative z-10 text-sm text-primary-foreground/60">
-          &copy; {new Date().getFullYear()} Apex Sports Club Management.
-        </div>
 
-        {/* Abstract decorative graphic */}
-        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-20 -right-20 w-72 h-72 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
-      </div>
-
-      {/* Form Panel - Right */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 overflow-y-auto">
-        <div className="w-full max-w-[400px] space-y-8 my-auto">
-          
-          <div className="text-center md:text-left">
-            <div className="md:hidden flex items-center justify-center gap-2 mb-8">
-              <div className="w-8 h-8 rounded-md bg-accent text-accent-foreground flex items-center justify-center">
-                <Activity className="w-5 h-5" />
-              </div>
-              <span className="text-lg font-bold tracking-tight text-foreground">Apex Sports</span>
+        <form onSubmit={handleUpdate} className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">New Password</label>
+            <div className="relative">
+              <input 
+                type={showPassword ? "text" : "password"} 
+                required 
+                minLength={6}
+                placeholder="Minimum 6 characters"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-4 pr-11 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm placeholder:text-[#555555] focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#777777] hover:text-[#F5F5F5] transition-colors cursor-pointer"
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
-            
-            <h2 className="text-3xl font-bold tracking-tight text-foreground">Set new password</h2>
-            <p className="text-muted-foreground mt-2">
-              Please enter your new password below.
-            </p>
           </div>
 
-          <form onSubmit={handleUpdate} className="space-y-5">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">New Password</label>
-              <div className="relative">
-                <input 
-                  type={showPassword ? "text" : "password"} 
-                  required 
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors pr-10"
-                />
-                <button 
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            <button 
-              type="submit" 
-              disabled={loading || password.length < 6}
-              className="w-full py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 transition-all flex items-center justify-center gap-2 mt-2"
-            >
-              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              {loading ? 'Updating...' : 'Update password'}
-            </button>
-          </form>
-        </div>
+          <Button
+            type="submit"
+            variant="primary"
+            className="w-full mt-2 h-11"
+            isLoading={loading}
+          >
+            Update & Sign In
+          </Button>
+        </form>
       </div>
     </div>
   );

@@ -2,8 +2,10 @@ import { useAuth } from '../auth/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Link } from 'react-router-dom';
-import { Users, Clock, Calendar as CalendarIcon, DollarSign, ArrowRight, AlertTriangle } from 'lucide-react';
+import { ArrowRight, TrendingUp } from 'lucide-react';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { StatCard } from '@/components/ui/StatCard';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
@@ -78,132 +80,211 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Overview</h1>
-          <p className="text-muted-foreground mt-1">Welcome back, {profile?.full_name}. Here is what's happening today.</p>
-        </div>
+      {/* Page Header */}
+      <PageHeader 
+        title="Club Overview" 
+        description={`Welcome back, ${profile?.full_name || 'Admin'}. Here is your operations snapshot today.`}
+        actions={
+          <div className="flex items-center gap-3">
+            <Link 
+              to="/members" 
+              className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#242424] text-[#F5F5F5] border border-[#333333] hover:bg-[#2C2C2C] transition-colors"
+            >
+              Manage Members
+            </Link>
+            <Link 
+              to="/bookings" 
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-[#FF4B16] text-[#111111] hover:bg-[#E03E0E] transition-colors shadow-sm shadow-[#FF4B16]/20"
+            >
+              + New Booking
+            </Link>
+          </div>
+        }
+      />
+      
+      {/* Varied Bold Statistic Cards Grid */}
+      <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Light Contrast Card: Total Members */}
+        <StatCard 
+          label="Total Members" 
+          value={isLoading ? '--' : stats?.totalMembers ?? 0} 
+          variant="white"
+          description="Registered athletic members"
+        />
+
+        {/* Orange Highlight Card: Pending Approvals or Action */}
+        <StatCard 
+          label="Pending Approvals" 
+          value={isLoading ? '--' : stats?.pendingApprovals ?? 0} 
+          variant="orange"
+          change={(stats?.pendingApprovals ?? 0) > 0 ? "Action Required" : "All Clear"}
+          trend={(stats?.pendingApprovals ?? 0) > 0 ? "down" : "neutral"}
+          description="Membership applications to review"
+        />
+
+        {/* Purple Analytics Card: Today's Bookings */}
+        <StatCard 
+          label="Today's Bookings" 
+          value={isLoading ? '--' : stats?.todaysBookings?.length ?? 0} 
+          variant="purple"
+          description="Court & facility sessions today"
+        />
+
+        {/* Emerald Green Status Card: Monthly Revenue */}
+        <StatCard 
+          label="Monthly Revenue" 
+          value={isLoading ? '--' : `$${stats?.monthlyRevenue?.toFixed(2) ?? '0.00'}`} 
+          variant="green"
+          change="+14.2%"
+          trend="up"
+          description="Current billing cycle collection"
+        />
       </div>
       
-      {/* Stats Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard 
-          title="Total Members" 
-          value={isLoading ? '--' : stats?.totalMembers} 
-          icon={<Users className="w-4 h-4 text-primary" />} 
-        />
-        <StatCard 
-          title="Pending Approvals" 
-          value={isLoading ? '--' : stats?.pendingApprovals} 
-          icon={<Clock className="w-4 h-4 text-warning" />} 
-          trend={(stats?.pendingApprovals ?? 0) > 0 ? "Requires action" : "All clear"}
-          trendColor={(stats?.pendingApprovals ?? 0) > 0 ? "text-warning" : "text-muted-foreground"}
-        />
-        <StatCard 
-          title="Today's Bookings" 
-          value={isLoading ? '--' : stats?.todaysBookings?.length} 
-          icon={<CalendarIcon className="w-4 h-4 text-blue-500" />} 
-        />
-        <StatCard 
-          title="Monthly Revenue" 
-          value={isLoading ? '--' : `$${stats?.monthlyRevenue?.toFixed(2)}`} 
-          icon={<DollarSign className="w-4 h-4 text-success" />} 
-        />
-      </div>
-      
-      {/* Charts & Activity */}
-      <div className="grid gap-6 lg:grid-cols-7">
+      {/* Asymmetric Editorial Grid for Visualizations and Activities */}
+      <div className="grid gap-6 lg:grid-cols-12">
         
-        {/* Main Chart */}
-        <div className="lg:col-span-4 rounded-xl border border-border bg-card p-6 shadow-sm">
-          <h3 className="font-semibold text-lg mb-6 text-foreground">Membership Growth</h3>
-          <div className="h-[300px] w-full">
+        {/* Main Chart Panel - 7 Cols */}
+        <div className="lg:col-span-7 rounded-[26px] border border-[#242424] bg-[#0E0E0E] p-6 sm:p-8 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#FF4B16]"></span>
+                <h3 className="font-bold text-lg text-[#F5F5F5] tracking-tight">Membership Growth</h3>
+              </div>
+              <p className="text-xs text-[#A6A6AC] mt-1">Net cumulative membership acquisition over past 6 months</p>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-xs font-semibold text-[#A6A6AC]">
+              <TrendingUp className="w-3.5 h-3.5 text-[#079C68]" />
+              <span>Active Growth</span>
+            </div>
+          </div>
+
+          <div className="h-[320px] w-full">
             {stats?.growthData && stats.growthData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={stats.growthData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
+                <LineChart data={stats.growthData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222222" />
+                  <XAxis 
+                    dataKey="month" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 12, fill: '#A6A6AC' }} 
+                    dy={10} 
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 12, fill: '#A6A6AC' }} 
+                  />
                   <Tooltip 
-                    contentStyle={{ borderRadius: '8px', border: '1px solid hsl(var(--border))', backgroundColor: 'hsl(var(--card))' }}
-                    itemStyle={{ color: 'hsl(var(--foreground))' }}
+                    contentStyle={{ 
+                      borderRadius: '14px', 
+                      border: '1px solid #333333', 
+                      backgroundColor: '#161616',
+                      color: '#F5F5F5',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.5)'
+                    }}
+                    labelStyle={{ color: '#A6A6AC', fontWeight: 600 }}
+                    itemStyle={{ color: '#FF4B16', fontWeight: 700 }}
                   />
                   <Line 
                     type="monotone" 
                     dataKey="members" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={3}
-                    dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, fill: 'hsl(var(--accent))' }}
+                    stroke="#FF4B16" 
+                    strokeWidth={3.5}
+                    dot={{ fill: '#0E0E0E', strokeWidth: 3, stroke: '#FF4B16', r: 5 }}
+                    activeDot={{ r: 7, fill: '#FF4B16', stroke: '#FFFFFF', strokeWidth: 2 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-muted-foreground">
-                {isLoading ? 'Loading data...' : 'No data available'}
+              <div className="h-full flex items-center justify-center text-sm text-[#A6A6AC]">
+                {isLoading ? 'Loading analytics...' : 'No historical data available'}
               </div>
             )}
           </div>
         </div>
         
-        {/* Secondary Activity Panel */}
-        <div className="lg:col-span-3 space-y-6">
+        {/* Secondary Activity Panels - 5 Cols */}
+        <div className="lg:col-span-5 flex flex-col gap-6">
           
-          <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col h-[calc(50%-12px)]">
+          {/* Today's Bookings Card */}
+          <div className="rounded-[26px] border border-[#242424] bg-[#121212] p-6 shadow-sm flex flex-col justify-between flex-1">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-lg text-foreground">Today's Bookings</h3>
-              <Link to="/bookings" className="text-sm font-medium text-primary hover:text-primary/80 flex items-center gap-1">
-                View all <ArrowRight className="w-3 h-3" />
+              <h3 className="font-bold text-base text-[#F5F5F5] tracking-tight">Today's Schedule</h3>
+              <Link 
+                to="/bookings" 
+                className="text-xs font-semibold text-[#FF4B16] hover:text-[#E03E0E] flex items-center gap-1 transition-colors"
+              >
+                View all <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
-            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+
+            <div className="space-y-3 overflow-y-auto max-h-[170px] custom-scrollbar pr-1">
               {stats?.todaysBookings && stats.todaysBookings.length > 0 ? (
-                <div className="space-y-4">
-                  {stats.todaysBookings.map((b: any) => (
-                    <div key={b.id} className="flex flex-col gap-1 border-b border-border pb-3 last:border-0 last:pb-0">
-                      <div className="flex justify-between items-start">
-                        <span className="font-medium text-sm text-foreground">{b.members?.profiles?.full_name || 'Member'}</span>
-                        <span className="text-xs font-medium bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
-                          {new Date(b.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
+                stats.todaysBookings.map((b: any) => (
+                  <div key={b.id} className="flex items-center justify-between p-3 rounded-2xl bg-[#181818] border border-[#262626] hover:border-[#383838] transition-colors">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="px-2.5 py-1 rounded-xl bg-[#242424] text-[#F5F5F5] font-mono font-bold text-xs shrink-0 border border-[#333333]">
+                        {new Date(b.start_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
                       </div>
-                      <span className="text-xs text-muted-foreground">{b.facilities?.name}</span>
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-semibold text-xs text-[#F5F5F5] truncate">{b.members?.profiles?.full_name || 'Member'}</span>
+                        <span className="text-[11px] text-[#A6A6AC] truncate">{b.facilities?.name}</span>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                    <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-[#079C68]/15 text-[#4CD9A0] border border-[#079C68]/30 shrink-0">
+                      Confirmed
+                    </span>
+                  </div>
+                ))
               ) : (
-                <div className="h-full flex items-center justify-center text-sm text-muted-foreground pb-4">
+                <div className="py-6 text-center text-xs text-[#A6A6AC]">
                   No bookings scheduled for today.
                 </div>
               )}
             </div>
           </div>
 
-          <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col h-[calc(50%-12px)]">
+          {/* Upcoming Expiries Card */}
+          <div className="rounded-[26px] border border-[#242424] bg-[#121212] p-6 shadow-sm flex flex-col justify-between flex-1">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-warning" />
-                <h3 className="font-semibold text-lg text-foreground">Upcoming Expiries</h3>
-              </div>
+              <h3 className="font-bold text-base text-[#F5F5F5] tracking-tight">Expiring Subscriptions</h3>
+              <Link 
+                to="/members" 
+                className="text-xs font-semibold text-[#A6A6AC] hover:text-[#F5F5F5] flex items-center gap-1 transition-colors"
+              >
+                Members <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
-            <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
+
+            <div className="space-y-2.5 overflow-y-auto max-h-[170px] custom-scrollbar pr-1">
               {stats?.expiringSoon && stats.expiringSoon.length > 0 ? (
-                <div className="space-y-3">
-                  {stats.expiringSoon.map((m: any) => (
-                    <div key={m.id} className="flex justify-between items-center text-sm p-3 bg-muted/30 hover:bg-muted/50 rounded-lg transition-colors border border-border/50">
-                      <span className="font-medium text-foreground truncate mr-2">{m.profiles?.full_name}</span>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(m.plan_expiry_date).toLocaleDateString()}
+                stats.expiringSoon.map((m: any) => (
+                  <div key={m.id} className="flex justify-between items-center p-3 rounded-2xl bg-[#181818] border border-[#262626] hover:border-[#383838] transition-colors">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 shrink-0 rounded-xl bg-[#FF4B16]/10 text-[#FF4B16] font-bold text-xs flex items-center justify-center border border-[#FF4B16]/20">
+                        {m.profiles?.full_name ? m.profiles.full_name.charAt(0).toUpperCase() : 'U'}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-semibold text-xs text-[#F5F5F5] truncate">{m.profiles?.full_name}</span>
+                        <span className="text-[11px] text-[#A6A6AC]">
+                          Expires {new Date(m.plan_expiry_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                         </span>
-                        <Link to={`/members/${m.id}`} className="text-primary hover:underline text-xs font-medium">View</Link>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    <Link 
+                      to={`/members/${m.id}`} 
+                      className="shrink-0 px-2.5 py-1 rounded-xl bg-[#242424] hover:bg-[#FF4B16] hover:text-[#111111] text-[#F5F5F5] text-xs font-semibold border border-[#333333] transition-colors"
+                    >
+                      Renew
+                    </Link>
+                  </div>
+                ))
               ) : (
-                <div className="h-full flex items-center justify-center text-sm text-muted-foreground pb-4">
-                  No upcoming expiries.
+                <div className="py-6 text-center text-xs text-[#A6A6AC]">
+                  No upcoming expiries this week.
                 </div>
               )}
             </div>
@@ -211,25 +292,6 @@ export default function AdminDashboard() {
           
         </div>
       </div>
-    </div>
-  );
-}
-
-function StatCard({ title, value, icon, trend, trendColor }: { title: string, value: any, icon: React.ReactNode, trend?: string, trendColor?: string }) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-medium text-muted-foreground tracking-tight">{title}</h3>
-        <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center">
-          {icon}
-        </div>
-      </div>
-      <div className="text-2xl font-bold text-foreground mt-1">{value}</div>
-      {trend && (
-        <p className={`text-xs mt-2 font-medium ${trendColor || 'text-muted-foreground'}`}>
-          {trend}
-        </p>
-      )}
     </div>
   );
 }

@@ -6,7 +6,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { Building2, MapPin, Users, Clock, DollarSign, Plus, X, Loader2, Edit3, Target } from 'lucide-react';
+import { Building2, MapPin, Plus, X, Edit3 } from 'lucide-react';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 const facilitySchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -102,234 +106,256 @@ export default function FacilitiesList() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Facilities</h1>
-          <p className="text-muted-foreground mt-1">Manage club venues, courts, and fields available for booking.</p>
-        </div>
-        {isAdmin && !isFormOpen && (
-          <button 
-            onClick={() => openForm()} 
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Add Facility
-          </button>
-        )}
-      </div>
+      <PageHeader 
+        title="Club Facilities & Courts" 
+        description="Browse courts, swimming lanes, fitness studios, and reserve training venues."
+        actions={
+          isAdmin && !isFormOpen && (
+            <Button 
+              variant="primary"
+              onClick={() => openForm()}
+              icon={<Plus className="w-4 h-4" />}
+            >
+              Add Facility
+            </Button>
+          )
+        }
+      />
 
+      {/* Admin Facility Drawer / Form */}
       {isFormOpen && isAdmin && (
-        <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="px-6 py-4 border-b border-border bg-muted/20 flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-foreground">{editingId ? 'Edit Facility' : 'New Facility'}</h2>
-            <button onClick={closeForm} className="text-muted-foreground hover:text-foreground transition-colors p-1">
+        <div className="bg-[#121212] rounded-[26px] border border-[#242424] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 mb-8">
+          <div className="px-7 py-5 border-b border-[#1E1E1E] bg-[#161616] flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#FF4B16]/15 border border-[#FF4B16]/30 flex items-center justify-center text-[#FF4B16]">
+                <Building2 className="w-4 h-4" />
+              </div>
+              <h2 className="text-lg font-bold text-[#F5F5F5]">
+                {editingId ? 'Edit Facility Details' : 'Register New Facility'}
+              </h2>
+            </div>
+            <button 
+              onClick={closeForm} 
+              className="p-2 rounded-xl text-[#A6A6AC] hover:text-[#F5F5F5] hover:bg-[#242424] transition-colors cursor-pointer"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
           
-          <form onSubmit={handleSubmit((data) => saveMutation.mutate(data))} className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              
+          <form onSubmit={handleSubmit((data) => saveMutation.mutate(data))} className="p-7">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Facility Name</label>
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Facility Name *</label>
                 <input 
                   {...register('name')} 
-                  placeholder="e.g., Center Court"
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors" 
+                  placeholder="e.g. Olympic Swimming Pool, Court 1" 
+                  className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all placeholder:text-[#555555]"
                 />
-                {errors.name && <p className="text-destructive text-sm mt-1">{errors.name.message}</p>}
+                {errors.name && <p className="text-[#E63946] text-xs mt-1">{errors.name.message}</p>}
               </div>
-              
+
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Sport (Optional)</label>
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Sport / Discipline</label>
                 <div className="relative">
                   <select 
                     {...register('sport_id')} 
-                    className="w-full pl-3 pr-10 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors appearance-none cursor-pointer"
+                    className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all appearance-none cursor-pointer"
                   >
-                    <option value="">None / General</option>
-                    {sports?.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    <option value="">General Facility (All sports)</option>
+                    {sports?.map(s => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
                   </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#A6A6AC]">
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                    </svg>
+                  </div>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Location</label>
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Location / Section</label>
                 <input 
                   {...register('location')} 
-                  placeholder="e.g., Main Building, Floor 1"
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors" 
+                  placeholder="e.g. East Wing, Outdoor Area B" 
+                  className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all placeholder:text-[#555555]"
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <Users className="w-4 h-4 text-muted-foreground" /> Capacity (People)
-                </label>
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Capacity (Athletes)</label>
                 <input 
                   type="number" 
                   {...register('capacity', { valueAsNumber: true })} 
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors" 
+                  className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all"
                 />
+                {errors.capacity && <p className="text-[#E63946] text-xs mt-1">{errors.capacity.message}</p>}
               </div>
-              
+
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-muted-foreground" /> Hourly Rate ($)
-                </label>
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Hourly Rate ($)</label>
                 <input 
                   type="number" 
                   step="0.01" 
                   {...register('hourly_rate', { valueAsNumber: true })} 
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors" 
+                  className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all"
                 />
               </div>
-              
+
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-muted-foreground" /> Booking Duration (Mins)
-                </label>
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Slot Duration (Minutes)</label>
                 <input 
                   type="number" 
                   step="15" 
                   {...register('booking_duration_minutes', { valueAsNumber: true })} 
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors" 
+                  className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all"
                 />
               </div>
-              
-              <div className="space-y-2 md:col-span-3">
-                <label className="text-sm font-medium text-foreground">Description</label>
+
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider">Description & Rules</label>
                 <textarea 
                   {...register('description')} 
-                  placeholder="Provide details about equipment, flooring, etc."
-                  className="w-full px-3 py-2.5 border border-border rounded-lg bg-background text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-colors h-24 resize-none" 
+                  placeholder="Facility specifications, flooring type, gear requirements..." 
+                  className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all h-24 resize-none placeholder:text-[#555555]"
                 />
               </div>
-              
-              <div className="md:col-span-3 flex items-center p-4 bg-muted/30 border border-border/50 rounded-lg">
+
+              <div className="md:col-span-2 flex items-center p-4 bg-[#181818] border border-[#262626] rounded-2xl">
                 <input 
                   type="checkbox" 
                   {...register('is_active')} 
-                  id="is_active" 
-                  className="w-4 h-4 text-primary rounded border-border focus:ring-primary accent-primary" 
+                  id="facility_is_active" 
+                  className="w-4 h-4 rounded border-[#333333] accent-[#FF4B16] cursor-pointer"
                 />
                 <div className="ml-3">
-                  <label htmlFor="is_active" className="text-sm font-medium text-foreground cursor-pointer">Active Status</label>
-                  <p className="text-xs text-muted-foreground">If active, members can book this facility.</p>
+                  <label htmlFor="facility_is_active" className="text-sm font-bold text-[#F5F5F5] cursor-pointer">Available for Booking</label>
+                  <p className="text-xs text-[#A6A6AC]">Active facilities can be reserved by members and assigned to training batches.</p>
                 </div>
               </div>
             </div>
-            
-            <div className="mt-6 pt-6 border-t border-border flex justify-end gap-3">
-              <button 
+
+            <div className="mt-8 pt-6 border-t border-[#1E1E1E] flex justify-end gap-3">
+              <Button 
                 type="button" 
-                onClick={closeForm} 
-                className="px-4 py-2 border border-border bg-background text-foreground rounded-lg font-medium text-sm hover:bg-muted transition-colors"
+                variant="secondary"
+                onClick={closeForm}
               >
                 Cancel
-              </button>
-              <button 
+              </Button>
+              <Button 
                 type="submit" 
-                disabled={saveMutation.isPending} 
-                className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
+                variant="primary"
+                isLoading={saveMutation.isPending}
               >
-                {saveMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                {saveMutation.isPending ? 'Saving...' : 'Save Facility'}
-              </button>
+                {saveMutation.isPending ? 'Saving...' : editingId ? 'Update Facility' : 'Create Facility'}
+              </Button>
             </div>
           </form>
         </div>
       )}
 
+      {/* Facilities Cards Grid */}
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center p-12 text-muted-foreground">
-          <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-          <p>Loading facilities...</p>
+        <div className="flex flex-col items-center justify-center py-20 text-[#A6A6AC]">
+          <div className="w-9 h-9 border-2 border-[#FF4B16] border-t-transparent rounded-full animate-spin mb-3" />
+          <p className="text-sm">Loading club facilities...</p>
         </div>
-      ) : (
+      ) : facilities && facilities.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {facilities?.map((facility) => (
+          {facilities.map((facility) => (
             <div 
               key={facility.id} 
-              className={`
-                relative flex flex-col p-6 bg-card rounded-2xl border shadow-sm transition-all duration-200 hover:shadow-md
-                ${!facility.is_active ? 'opacity-75 grayscale-[0.2]' : ''}
-              `}
+              className="bg-[#121212] rounded-[26px] border border-[#242424] hover:border-[#383838] shadow-sm hover:-translate-y-1 transition-all overflow-hidden flex flex-col p-7"
             >
               <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="font-bold text-xl text-foreground flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-primary" /> {facility.name}
-                  </h3>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1.5">
-                    <Target className="w-3.5 h-3.5" />
-                    <span>{facility.sports?.name || 'General Use'}</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#5035E8]/15 border border-[#5035E8]/30 flex items-center justify-center text-[#A594FF] shrink-0">
+                    <Building2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-lg text-[#F5F5F5] tracking-tight">{facility.name}</h3>
                     {facility.location && (
-                      <>
-                        <span className="w-1 h-1 rounded-full bg-border" />
-                        <MapPin className="w-3.5 h-3.5" />
-                        <span>{facility.location}</span>
-                      </>
+                      <p className="text-xs text-[#A6A6AC] flex items-center gap-1 mt-0.5">
+                        <MapPin className="w-3.5 h-3.5 text-[#FF4B16]" /> {facility.location}
+                      </p>
                     )}
                   </div>
                 </div>
-                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border shrink-0
-                  ${facility.is_active ? 'bg-success/10 text-success border-success/20' : 'bg-muted text-muted-foreground border-border'}`}>
-                  {facility.is_active ? 'Active' : 'Inactive'}
-                </span>
+                <Badge variant={facility.is_active ? 'green' : 'neutral'} size="sm">
+                  {facility.is_active ? 'Open' : 'Closed'}
+                </Badge>
               </div>
-              
-              <div className="mb-5 flex items-end gap-1">
-                <span className="text-3xl font-extrabold text-foreground">${facility.hourly_rate}</span>
-                <span className="text-muted-foreground mb-1 font-medium">/ hour</span>
+
+              <div className="my-2">
+                {facility.sports?.name ? (
+                  <Badge variant="purple" size="sm">
+                    {facility.sports.name}
+                  </Badge>
+                ) : (
+                  <Badge variant="neutral" size="sm">
+                    Multi-sport
+                  </Badge>
+                )}
               </div>
-              
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="flex flex-col p-3 bg-muted/40 rounded-lg border border-border/50">
-                  <span className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5" /> Capacity
-                  </span>
-                  <span className="text-sm font-semibold text-foreground">{facility.capacity} people</span>
-                </div>
-                <div className="flex flex-col p-3 bg-muted/40 rounded-lg border border-border/50">
-                  <span className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" /> Slot length
-                  </span>
-                  <span className="text-sm font-semibold text-foreground">{facility.booking_duration_minutes} mins</span>
-                </div>
-              </div>
-              
-              <p className="text-sm text-muted-foreground leading-relaxed flex-1 mb-6">
-                {facility.description || "No specific details provided for this facility."}
+
+              <p className="text-xs text-[#A6A6AC] leading-relaxed my-4 flex-1 line-clamp-2">
+                {facility.description || 'Modern athletic facility maintained to competitive club standards.'}
               </p>
-              
+
+              <div className="grid grid-cols-3 gap-2.5 p-3 rounded-2xl bg-[#181818] border border-[#262626] mb-5 text-center">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-[#A6A6AC] block">Rate</span>
+                  <span className="text-xs font-bold text-[#F5F5F5] mt-0.5 block">
+                    {facility.hourly_rate > 0 ? `$${facility.hourly_rate}/hr` : 'Free'}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-[#A6A6AC] block">Capacity</span>
+                  <span className="text-xs font-bold text-[#F5F5F5] mt-0.5 block">
+                    {facility.capacity} pax
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-[#A6A6AC] block">Slot</span>
+                  <span className="text-xs font-bold text-[#F5F5F5] mt-0.5 block">
+                    {facility.booking_duration_minutes}m
+                  </span>
+                </div>
+              </div>
+
               {isAdmin && (
-                <button 
-                  onClick={() => openForm(facility)} 
-                  className="w-full flex items-center justify-center gap-2 py-2.5 border border-border bg-muted/30 text-foreground rounded-lg font-medium text-sm hover:bg-muted hover:border-border/80 transition-colors mt-auto"
+                <Button 
+                  variant="secondary"
+                  size="sm"
+                  className="w-full mt-auto"
+                  onClick={() => openForm(facility)}
+                  icon={<Edit3 className="w-4 h-4" />}
                 >
-                  <Edit3 className="w-4 h-4" /> Edit Facility
-                </button>
+                  Edit Facility Settings
+                </Button>
               )}
             </div>
           ))}
-          {facilities?.length === 0 && (
-            <div className="col-span-full p-12 text-center border border-dashed border-border rounded-xl bg-muted/10">
-              <Building2 className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-1">No facilities found</h3>
-              <p className="text-muted-foreground mb-4">You haven't added any facilities yet.</p>
-              {isAdmin && (
-                <button 
-                  onClick={() => openForm()}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Facility
-                </button>
-              )}
-            </div>
-          )}
         </div>
+      ) : (
+        <EmptyState 
+          icon={<Building2 className="w-8 h-8" />}
+          title="No Facilities Registered"
+          description="Register courts, rinks, gymnasiums, and sports fields for athlete booking."
+          action={
+            isAdmin && (
+              <Button 
+                variant="primary" 
+                onClick={() => openForm()}
+                icon={<Plus className="w-4 h-4" />}
+              >
+                Add First Facility
+              </Button>
+            )
+          }
+        />
       )}
     </div>
   );

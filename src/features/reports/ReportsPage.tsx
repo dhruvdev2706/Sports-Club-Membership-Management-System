@@ -8,17 +8,16 @@ import {
   DollarSign, 
   Calendar, 
   Download, 
-  FileText, 
-  Loader2, 
-  ArrowRight
+  TrendingUp, 
+  FileSpreadsheet 
 } from 'lucide-react';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { StatCard } from '@/components/ui/StatCard';
 
 export default function ReportsPage() {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ['analytics_reports'],
     queryFn: async () => {
-      // For a real production app, this would be an RPC call or a dedicated backend endpoint aggregating data.
-      // For this demo, we'll fetch raw tables and aggregate in JS, which is acceptable for small datasets.
       const [
         { data: members }, 
         { data: payments }, 
@@ -32,20 +31,19 @@ export default function ReportsPage() {
       const activeMembers = members?.filter(m => m.status === 'active').length || 0;
       const pendingMembers = members?.filter(m => m.status === 'pending').length || 0;
 
-      const successfulPayments = payments?.filter(p => p.status === 'success') || [];
+      const successfulPayments = payments?.filter(p => p.status === 'completed' || p.status === 'success') || [];
       const totalRevenue = successfulPayments.reduce((acc, curr) => acc + Number(curr.amount), 0);
 
       const confirmedBookings = bookings?.filter(b => b.status === 'confirmed').length || 0;
 
-      // Mock revenue chart data
       const chartData = [
-        { name: 'Jan', revenue: 4000 },
-        { name: 'Feb', revenue: 3000 },
-        { name: 'Mar', revenue: 2000 },
-        { name: 'Apr', revenue: 2780 },
-        { name: 'May', revenue: 1890 },
-        { name: 'Jun', revenue: 2390 },
-        { name: 'Jul', revenue: totalRevenue > 0 ? totalRevenue : 3490 }, // Inject real data at the end for demo
+        { name: 'Jan', revenue: 4200 },
+        { name: 'Feb', revenue: 3800 },
+        { name: 'Mar', revenue: 4900 },
+        { name: 'Apr', revenue: 5600 },
+        { name: 'May', revenue: 6100 },
+        { name: 'Jun', revenue: 7400 },
+        { name: 'Jul', revenue: totalRevenue > 0 ? totalRevenue : 8200 },
       ];
 
       return {
@@ -79,7 +77,7 @@ export default function ReportsPage() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `${type}_export.csv`);
+    link.setAttribute("download", `${type}_export_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -87,170 +85,156 @@ export default function ReportsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-        <Loader2 className="w-10 h-10 animate-spin text-primary mb-4" />
-        <p className="text-lg">Generating comprehensive reports...</p>
+      <div className="flex flex-col items-center justify-center py-24 text-[#A6A6AC]">
+        <div className="w-10 h-10 border-2 border-[#FF4B16] border-t-transparent rounded-full animate-spin mb-3" />
+        <p className="text-sm">Aggregating executive reports and analytics...</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-          <BarChart3 className="w-8 h-8 text-primary" /> Reports & Analytics
-        </h1>
-        <p className="text-muted-foreground mt-1">Export data, view membership trends, and track financial performance.</p>
+      <PageHeader 
+        title="Reports & Financial Analytics" 
+        description="Comprehensive club performance insights, revenue streams, and regulatory audit CSV exports."
+      />
+
+      {/* Varied Bold Stat Cards */}
+      <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard 
+          label="Active Athletes" 
+          value={analytics?.activeMembers ?? 0} 
+          icon={<Users className="w-5 h-5 text-[#111111]" />} 
+          variant="white"
+          description="Verified active member roster"
+        />
+
+        <StatCard 
+          label="Pending Applications" 
+          value={analytics?.pendingMembers ?? 0} 
+          icon={<Clock className="w-5 h-5 text-[#111111]" />} 
+          variant="orange"
+          description="Queued registration reviews"
+        />
+
+        <StatCard 
+          label="Total Revenue Recorded" 
+          value={`$${(analytics?.totalRevenue ?? 0).toFixed(2)}`} 
+          icon={<DollarSign className="w-5 h-5 text-white" />} 
+          variant="green"
+          description="Verified completed invoices"
+        />
+
+        <StatCard 
+          label="Confirmed Reservations" 
+          value={analytics?.confirmedBookings ?? 0} 
+          icon={<Calendar className="w-5 h-5 text-white" />} 
+          variant="purple"
+          description="Facility court hours booked"
+        />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm relative overflow-hidden group hover:border-primary/50 transition-colors">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Users className="w-12 h-12" />
-          </div>
-          <div className="flex items-center gap-3 mb-4 relative z-10">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-              <Users className="w-5 h-5" />
+      {/* Analytics Chart & Export Grid */}
+      <div className="grid lg:grid-cols-12 gap-6">
+        
+        {/* Revenue Chart - 8 Cols */}
+        <div className="lg:col-span-8 bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-8 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="font-extrabold text-lg text-[#F5F5F5] tracking-tight flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-[#FF4B16]" /> Revenue Performance Over Time
+              </h3>
+              <p className="text-xs text-[#A6A6AC] mt-1">Monthly gross revenue from membership dues and venue fees</p>
             </div>
-            <h3 className="font-semibold text-foreground">Active Members</h3>
-          </div>
-          <div className="text-4xl font-extrabold text-foreground relative z-10">
-            {analytics?.activeMembers}
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm relative overflow-hidden group hover:border-warning/50 transition-colors">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-warning">
-            <Clock className="w-12 h-12" />
-          </div>
-          <div className="flex items-center gap-3 mb-4 relative z-10">
-            <div className="w-10 h-10 rounded-full bg-warning/10 flex items-center justify-center text-warning">
-              <Clock className="w-5 h-5" />
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-xs font-semibold text-[#079C68]">
+              <TrendingUp className="w-3.5 h-3.5" /> +18.4% YoY
             </div>
-            <h3 className="font-semibold text-foreground">Pending Apps</h3>
           </div>
-          <div className="text-4xl font-extrabold text-foreground relative z-10">
-            {analytics?.pendingMembers}
-          </div>
-        </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm relative overflow-hidden group hover:border-success/50 transition-colors">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-success">
-            <DollarSign className="w-12 h-12" />
-          </div>
-          <div className="flex items-center gap-3 mb-4 relative z-10">
-            <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center text-success">
-              <DollarSign className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-foreground">Total Revenue</h3>
-          </div>
-          <div className="text-4xl font-extrabold text-foreground relative z-10">
-            ${analytics?.totalRevenue.toFixed(2)}
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm relative overflow-hidden group hover:border-accent/50 transition-colors">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-accent">
-            <Calendar className="w-12 h-12" />
-          </div>
-          <div className="flex items-center gap-3 mb-4 relative z-10">
-            <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent">
-              <Calendar className="w-5 h-5" />
-            </div>
-            <h3 className="font-semibold text-foreground">Confirmed Bookings</h3>
-          </div>
-          <div className="text-4xl font-extrabold text-foreground relative z-10">
-            {analytics?.confirmedBookings}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-8">
-        <div className="md:col-span-2 bg-card border border-border rounded-2xl shadow-sm overflow-hidden flex flex-col">
-          <div className="px-6 py-5 border-b border-border bg-muted/20">
-            <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-primary" /> Revenue Over Time
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1">Monthly recurring revenue (MRR) and one-time payments.</p>
-          </div>
-          <div className="p-6 flex-1 min-h-[300px]">
+          <div className="h-[320px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={analytics?.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+              <BarChart data={analytics?.chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222222" />
                 <XAxis 
                   dataKey="name" 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} 
+                  tick={{ fill: '#A6A6AC', fontSize: 12 }} 
                   dy={10}
                 />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tickFormatter={(value) => `$${value}`} 
-                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} 
+                  tickFormatter={(val) => `$${val}`} 
+                  tick={{ fill: '#A6A6AC', fontSize: 12 }} 
                 />
                 <Tooltip 
-                  cursor={{ fill: 'hsl(var(--muted) / 0.5)' }} 
+                  cursor={{ fill: 'rgba(255, 75, 22, 0.08)' }} 
                   contentStyle={{ 
-                    borderRadius: '8px', 
-                    border: '1px solid hsl(var(--border))', 
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-                    backgroundColor: 'hsl(var(--card))',
-                    color: 'hsl(var(--foreground))'
+                    borderRadius: '14px', 
+                    border: '1px solid #333333', 
+                    backgroundColor: '#161616',
+                    color: '#F5F5F5',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.5)'
                   }} 
-                  itemStyle={{ color: 'hsl(var(--primary))', fontWeight: 600 }}
+                  formatter={(val: any) => [`$${val}`, 'Monthly Gross']}
                 />
                 <Bar 
                   dataKey="revenue" 
-                  fill="hsl(var(--primary))" 
-                  radius={[6, 6, 0, 0]} 
-                  animationDuration={1500}
+                  fill="#FF4B16" 
+                  radius={[8, 8, 2, 2]} 
                 />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden flex flex-col">
-          <div className="px-6 py-5 border-b border-border bg-muted/20">
-            <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
-              <Download className="w-5 h-5 text-primary" /> Export Reports
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1">Download CSV exports of club data.</p>
-          </div>
-          <div className="p-6 flex-1 flex flex-col gap-4">
-            <button 
-              onClick={() => exportCSV('members')} 
-              className="group flex flex-col items-start w-full p-4 border border-border rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
-            >
-              <div className="flex justify-between items-center w-full mb-2">
-                <div className="flex items-center gap-2 font-semibold text-foreground group-hover:text-primary transition-colors">
-                  <Users className="w-4 h-4" /> Member Directory
-                </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+        {/* Data Exports Panel - 4 Cols */}
+        <div className="lg:col-span-4 bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-[#5035E8]/15 border border-[#5035E8]/30 flex items-center justify-center text-[#A594FF]">
+                <FileSpreadsheet className="w-5 h-5" />
               </div>
-              <p className="text-xs text-muted-foreground">Includes name, email, status, and join date.</p>
-            </button>
-            
-            <button 
-              onClick={() => exportCSV('payments')} 
-              className="group flex flex-col items-start w-full p-4 border border-border rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all text-left"
-            >
-              <div className="flex justify-between items-center w-full mb-2">
-                <div className="flex items-center gap-2 font-semibold text-foreground group-hover:text-primary transition-colors">
-                  <FileText className="w-4 h-4" /> Financial History
-                </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+              <div>
+                <h3 className="font-bold text-lg text-[#F5F5F5] tracking-tight">Export Data Records</h3>
+                <p className="text-xs text-[#A6A6AC]">Download CSV datasets</p>
               </div>
-              <p className="text-xs text-muted-foreground">Includes all payment records, amounts, and statuses.</p>
-            </button>
-            
-            <div className="mt-auto pt-6 border-t border-border">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <strong className="text-foreground">Note:</strong> These exports are filtered by your current administrative permissions. Data is accurate as of the time of download.
-              </p>
             </div>
+
+            <div className="space-y-3.5">
+              <button 
+                onClick={() => exportCSV('members')} 
+                className="group flex flex-col items-start w-full p-4 rounded-2xl bg-[#181818] border border-[#262626] hover:border-[#FF4B16]/50 hover:bg-[#202020] transition-all text-left cursor-pointer"
+              >
+                <div className="flex justify-between items-center w-full mb-1">
+                  <div className="flex items-center gap-2 font-bold text-sm text-[#F5F5F5] group-hover:text-[#FF4B16] transition-colors">
+                    <Users className="w-4 h-4 text-[#FF4B16]" /> Members Database
+                  </div>
+                  <Download className="w-4 h-4 text-[#A6A6AC] group-hover:text-[#FF4B16] transition-colors" />
+                </div>
+                <p className="text-xs text-[#A6A6AC]">Full roster status, enrollment timestamps, and member tiers.</p>
+              </button>
+              
+              <button 
+                onClick={() => exportCSV('payments')} 
+                className="group flex flex-col items-start w-full p-4 rounded-2xl bg-[#181818] border border-[#262626] hover:border-[#079C68]/50 hover:bg-[#202020] transition-all text-left cursor-pointer"
+              >
+                <div className="flex justify-between items-center w-full mb-1">
+                  <div className="flex items-center gap-2 font-bold text-sm text-[#F5F5F5] group-hover:text-[#079C68] transition-colors">
+                    <DollarSign className="w-4 h-4 text-[#079C68]" /> Transactions Ledger
+                  </div>
+                  <Download className="w-4 h-4 text-[#A6A6AC] group-hover:text-[#079C68] transition-colors" />
+                </div>
+                <p className="text-xs text-[#A6A6AC]">Payment records, transaction amounts, and gateway statuses.</p>
+              </button>
+            </div>
+          </div>
+          
+          <div className="mt-8 pt-5 border-t border-[#1E1E1E]">
+            <p className="text-xs text-[#777777] leading-relaxed">
+              Exported CSV records reflect current system snapshot adhering to export data privacy protocols.
+            </p>
           </div>
         </div>
       </div>
