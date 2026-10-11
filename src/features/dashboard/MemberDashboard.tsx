@@ -142,7 +142,7 @@ export default function MemberDashboard() {
       {/* Main Editorial Panels */}
       <div className="grid gap-5 sm:gap-6 lg:grid-cols-12">
         {/* Membership Details Card - 7 Cols */}
-        <div className="lg:col-span-7 rounded-[20px] sm:rounded-[26px] border border-[#242424] bg-[#121212] p-5 sm:p-7 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-7 rounded-[10px] sm:rounded-[13px] border border-[#242424] bg-[#121212] p-5 sm:p-7 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between gap-3 mb-5 sm:mb-6">
               <div>
@@ -193,7 +193,7 @@ export default function MemberDashboard() {
         </div>
 
         {/* Upcoming Bookings Panel - 5 Cols */}
-        <div className="lg:col-span-5 rounded-[20px] sm:rounded-[26px] border border-[#242424] bg-[#121212] p-5 sm:p-7 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-5 rounded-[10px] sm:rounded-[13px] border border-[#242424] bg-[#121212] p-5 sm:p-7 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-6">
               <div>

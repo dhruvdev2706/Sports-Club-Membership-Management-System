@@ -4,7 +4,7 @@ import { ShieldAlert, ArrowLeft } from 'lucide-react';
 export default function Unauthorized() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#080808] text-[#F5F5F5] p-6">
-      <div className="text-center p-8 sm:p-12 bg-[#121212] border border-[#242424] rounded-[28px] shadow-2xl max-w-md w-full">
+      <div className="text-center p-8 sm:p-12 bg-[#121212] border border-[#242424] rounded-[14px] shadow-2xl max-w-md w-full">
         <div className="w-16 h-16 rounded-2xl bg-[#E63946]/15 border border-[#E63946]/30 flex items-center justify-center text-[#E63946] mx-auto mb-6">
           <ShieldAlert className="w-8 h-8" />
         </div>

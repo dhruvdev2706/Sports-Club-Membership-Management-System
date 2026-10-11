@@ -50,7 +50,7 @@ export default function CoachesList() {
       />
 
       {/* Search Toolbar */}
-      <div className="bg-[#121212] border border-[#242424] rounded-[20px] p-4 shadow-sm flex flex-col sm:flex-row gap-4">
+      <div className="bg-[#121212] border border-[#242424] rounded-[10px] p-4 shadow-sm flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A6A6AC]" />
           <input 
@@ -73,7 +73,7 @@ export default function CoachesList() {
           {filteredCoaches.map((coach: any) => (
             <div 
               key={coach.id} 
-              className="group flex flex-col bg-[#121212] rounded-[26px] border border-[#242424] hover:border-[#383838] shadow-sm hover:-translate-y-1 transition-all overflow-hidden p-6"
+              className="group flex flex-col bg-[#121212] rounded-[13px] border border-[#242424] hover:border-[#383838] shadow-sm hover:-translate-y-1 transition-all overflow-hidden p-6"
             >
               <div className="flex flex-col items-center text-center pb-5">
                 <div className="w-20 h-20 rounded-2xl bg-[#5035E8]/20 border border-[#5035E8]/35 flex items-center justify-center text-[#A594FF] text-2xl font-extrabold mb-4 shadow-inner relative group-hover:scale-105 transition-transform">

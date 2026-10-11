@@ -36,9 +36,9 @@ export const Card: React.FC<CardProps> = ({
   }[variant];
 
   const radiusStyles = {
-    default: 'rounded-[16px] sm:rounded-[20px]',
-    card: 'rounded-[16px] sm:rounded-[20px]',
-    panel: 'rounded-[18px] sm:rounded-[26px]',
+    default: 'rounded-[8px] sm:rounded-[10px]',
+    card: 'rounded-[8px] sm:rounded-[10px]',
+    panel: 'rounded-[9px] sm:rounded-[13px]',
   }[radius];
 
   const interactiveStyles = interactive

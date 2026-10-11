@@ -99,7 +99,7 @@ export default function AttendancePage() {
       />
 
       {/* Selectors Bar */}
-      <div className="bg-[#121212] border border-[#242424] rounded-[24px] p-6 shadow-sm">
+      <div className="bg-[#121212] border border-[#242424] rounded-[12px] p-6 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="space-y-2">
             <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider block">
@@ -175,7 +175,7 @@ export default function AttendancePage() {
           </div>
 
           {/* Members Attendance List */}
-          <div className="bg-[#121212] border border-[#242424] rounded-[24px] shadow-sm overflow-hidden">
+          <div className="bg-[#121212] border border-[#242424] rounded-[12px] shadow-sm overflow-hidden">
             {loadingAttendance ? (
               <div className="flex flex-col items-center justify-center py-16 text-[#A6A6AC]">
                 <div className="w-8 h-8 border-2 border-[#FF4B16] border-t-transparent rounded-full animate-spin mb-2" />

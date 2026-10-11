@@ -81,7 +81,7 @@ export const StatCard: React.FC<StatCardProps> = ({
 
   return (
     <div
-      className={`rounded-[18px] sm:rounded-[24px] border p-4 sm:p-6 flex flex-col justify-between transition-all duration-200 min-h-[128px] sm:min-h-[160px] ${variantStyles.card} ${className}`}
+      className={`rounded-[9px] sm:rounded-[12px] border p-4 sm:p-6 flex flex-col justify-between transition-all duration-200 min-h-[128px] sm:min-h-[160px] ${variantStyles.card} ${className}`}
     >
       <div className="flex items-center justify-between gap-2.5 sm:gap-3 mb-3 sm:mb-4">
         <span className={`text-[11px] sm:text-xs uppercase tracking-wider font-semibold ${variantStyles.label}`}>

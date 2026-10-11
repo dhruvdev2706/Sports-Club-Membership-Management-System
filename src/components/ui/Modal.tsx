@@ -57,7 +57,7 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         role="dialog"
         aria-modal="true"
-        className={`relative w-full ${maxWidthStyles} max-h-[90vh] flex flex-col bg-[#141414] border border-[#282828] rounded-[20px] sm:rounded-[28px] p-5 sm:p-7 shadow-2xl text-[#F5F5F5] z-10 my-auto animate-in fade-in zoom-in-95 duration-200`}
+        className={`relative w-full ${maxWidthStyles} max-h-[90vh] flex flex-col bg-[#141414] border border-[#282828] rounded-[10px] sm:rounded-[14px] p-5 sm:p-7 shadow-2xl text-[#F5F5F5] z-10 my-auto animate-in fade-in zoom-in-95 duration-200`}
       >
         <div className="flex items-start justify-between gap-3 sm:gap-4 mb-4 sm:mb-5 pb-3 border-b border-[#222222] shrink-0">
           <div>

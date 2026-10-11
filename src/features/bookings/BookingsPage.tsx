@@ -191,7 +191,7 @@ export default function BookingsPage() {
         
         {/* Left Side: Venue & Date Selector & Time Slots (7 Cols) */}
         <div className="lg:col-span-7 space-y-6">
-          <div className="bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-7 shadow-sm">
+          <div className="bg-[#121212] border border-[#242424] rounded-[13px] p-6 sm:p-7 shadow-sm">
             <h3 className="font-bold text-lg text-[#F5F5F5] mb-5">
               Select Facility & Date
             </h3>
@@ -308,7 +308,7 @@ export default function BookingsPage() {
         </div>
 
         {/* Right Side: Active Reservations List (5 Cols) */}
-        <div className="lg:col-span-5 bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-[#121212] border border-[#242424] rounded-[13px] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-bold text-lg text-[#F5F5F5]">

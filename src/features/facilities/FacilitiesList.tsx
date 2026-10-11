@@ -124,7 +124,7 @@ export default function FacilitiesList() {
 
       {/* Admin Facility Drawer / Form */}
       {isFormOpen && isAdmin && (
-        <div className="bg-[#121212] rounded-[26px] border border-[#242424] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 mb-8">
+        <div className="bg-[#121212] rounded-[13px] border border-[#242424] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300 mb-8">
           <div className="px-7 py-5 border-b border-[#1E1E1E] bg-[#161616] flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-[#FF4B16]/15 border border-[#FF4B16]/30 flex items-center justify-center text-[#FF4B16]">
@@ -267,7 +267,7 @@ export default function FacilitiesList() {
           {facilities.map((facility) => (
             <div 
               key={facility.id} 
-              className="bg-[#121212] rounded-[26px] border border-[#242424] hover:border-[#383838] shadow-sm hover:-translate-y-1 transition-all overflow-hidden flex flex-col p-7"
+              className="bg-[#121212] rounded-[13px] border border-[#242424] hover:border-[#383838] shadow-sm hover:-translate-y-1 transition-all overflow-hidden flex flex-col p-7"
             >
               <div className="flex justify-between items-start mb-4">
                 <div>

@@ -3,6 +3,17 @@
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
+@theme {
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 5px;
+  --radius-lg: 6px;
+  --radius-xl: 7px;
+  --radius-2xl: 10px;
+  --radius-3xl: 12px;
+  --radius-4xl: 14px;
+}
+
 :root {
   /* Exact Base Tokens */
   --canvas-black: #080808;
@@ -61,7 +72,7 @@
   --destructive-foreground: #FFFFFF;
   --border: #242424;
   --ring: #FF4B16;
-  --radius: 14px;
+  --radius: 7px;
 }
 
 @layer base {

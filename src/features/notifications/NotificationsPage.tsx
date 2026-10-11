@@ -87,7 +87,7 @@ export default function NotificationsPage() {
         }
       />
 
-      <div className="bg-[#121212] border border-[#242424] rounded-[26px] shadow-sm overflow-hidden">
+      <div className="bg-[#121212] border border-[#242424] rounded-[13px] shadow-sm overflow-hidden">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 text-[#A6A6AC]">
             <div className="w-8 h-8 border-2 border-[#FF4B16] border-t-transparent rounded-full animate-spin mb-2" />

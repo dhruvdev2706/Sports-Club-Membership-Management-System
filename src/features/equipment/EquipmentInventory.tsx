@@ -142,7 +142,7 @@ export default function EquipmentInventory() {
               return (
                 <div 
                   key={item.id} 
-                  className="bg-[#121212] rounded-[26px] border border-[#242424] hover:border-[#383838] p-6 shadow-sm flex flex-col justify-between transition-all"
+                  className="bg-[#121212] rounded-[13px] border border-[#242424] hover:border-[#383838] p-6 shadow-sm flex flex-col justify-between transition-all"
                 >
                   <div>
                     <div className="flex justify-between items-start mb-3">
@@ -209,7 +209,7 @@ export default function EquipmentInventory() {
           Active Loan & Checkout Logs
         </h3>
 
-        <div className="bg-[#121212] border border-[#242424] rounded-[24px] shadow-sm overflow-hidden flex flex-col">
+        <div className="bg-[#121212] border border-[#242424] rounded-[12px] shadow-sm overflow-hidden flex flex-col">
           <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left text-sm whitespace-nowrap">
               <thead className="bg-[#0A0A0A] text-[#A6A6AC] border-b border-[#242424]">

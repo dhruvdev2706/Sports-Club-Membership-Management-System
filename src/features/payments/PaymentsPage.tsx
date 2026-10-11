@@ -123,7 +123,7 @@ export default function PaymentsPage() {
 
       {/* Record Payment Drawer / Form */}
       {isFormOpen && isAdmin && (
-        <div className="bg-[#121212] rounded-[26px] border border-[#242424] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="bg-[#121212] rounded-[13px] border border-[#242424] shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="px-7 py-5 border-b border-[#1E1E1E] bg-[#161616] flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-[#079C68]/15 border border-[#079C68]/30 flex items-center justify-center text-[#4CD9A0]">
@@ -207,7 +207,7 @@ export default function PaymentsPage() {
       )}
 
       {/* Transactions Table */}
-      <div className="bg-[#121212] border border-[#242424] rounded-[24px] shadow-sm overflow-hidden flex flex-col">
+      <div className="bg-[#121212] border border-[#242424] rounded-[12px] shadow-sm overflow-hidden flex flex-col">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-[#0A0A0A] text-[#A6A6AC] border-b border-[#242424]">

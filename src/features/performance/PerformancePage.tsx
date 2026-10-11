@@ -90,7 +90,7 @@ export default function PerformancePage() {
       <div className="grid gap-6 lg:grid-cols-12">
         {/* Coach Evaluation Input Form (if Coach or Admin) */}
         {isAdminOrCoach && (
-          <div className="lg:col-span-5 bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
+          <div className="lg:col-span-5 bg-[#121212] border border-[#242424] rounded-[13px] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
             <div>
               <div className="mb-6">
                 <h3 className="font-bold text-lg text-[#F5F5F5] tracking-tight">Record Evaluation</h3>
@@ -175,7 +175,7 @@ export default function PerformancePage() {
         )}
 
         {/* Evaluations History Feed (7 or 12 Cols) */}
-        <div className={`${isAdminOrCoach ? 'lg:col-span-7' : 'lg:col-span-12'} bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-7 shadow-sm flex flex-col justify-between`}>
+        <div className={`${isAdminOrCoach ? 'lg:col-span-7' : 'lg:col-span-12'} bg-[#121212] border border-[#242424] rounded-[13px] p-6 sm:p-7 shadow-sm flex flex-col justify-between`}>
           <div>
             <div className="flex items-center justify-between mb-6">
               <div>

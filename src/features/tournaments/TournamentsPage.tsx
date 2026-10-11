@@ -114,7 +114,7 @@ export default function TournamentsPage() {
             return (
               <div 
                 key={t.id} 
-                className="bg-[#121212] rounded-[26px] border border-[#242424] hover:border-[#383838] p-7 shadow-sm flex flex-col justify-between transition-all hover:-translate-y-1"
+                className="bg-[#121212] rounded-[13px] border border-[#242424] hover:border-[#383838] p-7 shadow-sm flex flex-col justify-between transition-all hover:-translate-y-1"
               >
                 <div>
                   <div className="flex justify-between items-start mb-4">

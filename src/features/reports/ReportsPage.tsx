@@ -138,7 +138,7 @@ export default function ReportsPage() {
       <div className="grid lg:grid-cols-12 gap-6">
         
         {/* Revenue Chart - 8 Cols */}
-        <div className="lg:col-span-8 bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-8 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-8 bg-[#121212] border border-[#242424] rounded-[13px] p-6 sm:p-8 shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="font-extrabold text-lg text-[#F5F5F5] tracking-tight flex items-center gap-2">
@@ -171,7 +171,7 @@ export default function ReportsPage() {
                 <Tooltip 
                   cursor={{ fill: 'rgba(255, 75, 22, 0.08)' }} 
                   contentStyle={{ 
-                    borderRadius: '14px', 
+                    borderRadius: '7px', 
                     border: '1px solid #333333', 
                     backgroundColor: '#161616',
                     color: '#F5F5F5',
@@ -182,7 +182,7 @@ export default function ReportsPage() {
                 <Bar 
                   dataKey="revenue" 
                   fill="#FF4B16" 
-                  radius={[8, 8, 2, 2]} 
+                  radius={[4, 4, 1, 1]} 
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -190,7 +190,7 @@ export default function ReportsPage() {
         </div>
 
         {/* Data Exports Panel - 4 Cols */}
-        <div className="lg:col-span-4 bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-4 bg-[#121212] border border-[#242424] rounded-[13px] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl bg-[#5035E8]/15 border border-[#5035E8]/30 flex items-center justify-center text-[#A594FF]">

@@ -59,7 +59,7 @@ export default function CoachDashboard() {
 
       {/* Quick Action Editorial Grid */}
       <div className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-[26px] border border-[#242424] bg-[#121212] p-7 flex flex-col justify-between">
+        <div className="rounded-[13px] border border-[#242424] bg-[#121212] p-7 flex flex-col justify-between">
           <div>
             <div className="w-12 h-12 rounded-2xl bg-[#5035E8]/15 border border-[#5035E8]/30 flex items-center justify-center text-[#A594FF] mb-4">
               <Activity className="w-6 h-6" />
@@ -77,7 +77,7 @@ export default function CoachDashboard() {
           </Link>
         </div>
 
-        <div className="rounded-[26px] border border-[#242424] bg-[#121212] p-7 flex flex-col justify-between">
+        <div className="rounded-[13px] border border-[#242424] bg-[#121212] p-7 flex flex-col justify-between">
           <div>
             <div className="w-12 h-12 rounded-2xl bg-[#079C68]/15 border border-[#079C68]/30 flex items-center justify-center text-[#4CD9A0] mb-4">
               <Award className="w-6 h-6" />

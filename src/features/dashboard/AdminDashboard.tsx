@@ -145,7 +145,7 @@ export default function AdminDashboard() {
       <div className="grid gap-5 sm:gap-6 lg:grid-cols-12">
         
         {/* Main Chart Panel - 7 Cols */}
-        <div className="lg:col-span-7 rounded-[20px] sm:rounded-[26px] border border-[#242424] bg-[#0E0E0E] p-4 sm:p-7 lg:p-8 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-7 rounded-[10px] sm:rounded-[13px] border border-[#242424] bg-[#0E0E0E] p-4 sm:p-7 lg:p-8 shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between gap-3 mb-5 sm:mb-6">
             <div>
               <div className="flex items-center gap-2">
@@ -210,7 +210,7 @@ export default function AdminDashboard() {
         <div className="lg:col-span-5 flex flex-col gap-5 sm:gap-6">
           
           {/* Today's Bookings Card */}
-          <div className="rounded-[20px] sm:rounded-[26px] border border-[#242424] bg-[#121212] p-4 sm:p-6 shadow-sm flex flex-col justify-between flex-1">
+          <div className="rounded-[10px] sm:rounded-[13px] border border-[#242424] bg-[#121212] p-4 sm:p-6 shadow-sm flex flex-col justify-between flex-1">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-base text-[#F5F5F5] tracking-tight">Today's Schedule</h3>
               <Link 
@@ -248,7 +248,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Upcoming Expiries Card */}
-          <div className="rounded-[26px] border border-[#242424] bg-[#121212] p-6 shadow-sm flex flex-col justify-between flex-1">
+          <div className="rounded-[13px] border border-[#242424] bg-[#121212] p-6 shadow-sm flex flex-col justify-between flex-1">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-base text-[#F5F5F5] tracking-tight">Expiring Subscriptions</h3>
               <Link 

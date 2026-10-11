@@ -73,7 +73,7 @@ export default function MembersList() {
       />
 
       {/* Search & Filters Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-3 bg-[#121212] p-4 rounded-[20px] border border-[#242424] shadow-sm">
+      <div className="flex flex-col sm:flex-row gap-3 bg-[#121212] p-4 rounded-[10px] border border-[#242424] shadow-sm">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A6A6AC] pointer-events-none" />
           <input 
@@ -112,7 +112,7 @@ export default function MembersList() {
       </div>
 
       {/* Data Table */}
-      <div className="bg-[#121212] border border-[#242424] rounded-[24px] shadow-sm overflow-hidden flex flex-col">
+      <div className="bg-[#121212] border border-[#242424] rounded-[12px] shadow-sm overflow-hidden flex flex-col">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-[#0A0A0A] text-[#A6A6AC] border-b border-[#242424]">

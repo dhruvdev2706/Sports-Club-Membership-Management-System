@@ -115,7 +115,7 @@ export default function MemberProfile() {
 
   if (!member) {
     return (
-      <div className="p-8 text-center bg-[#121212] rounded-[24px] border border-[#242424] max-w-xl mx-auto my-12">
+      <div className="p-8 text-center bg-[#121212] rounded-[12px] border border-[#242424] max-w-xl mx-auto my-12">
         <AlertTriangle className="w-10 h-10 text-[#FF4B16] mx-auto mb-3" />
         <h2 className="text-xl font-bold text-[#F5F5F5] mb-2">Member Not Found</h2>
         <p className="text-sm text-[#A6A6AC] mb-6">The requested member record does not exist or has been removed.</p>
@@ -155,7 +155,7 @@ export default function MemberProfile() {
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Members Directory
         </Link>
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 sm:p-7 rounded-[26px] bg-[#121212] border border-[#242424] shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 sm:p-7 rounded-[13px] bg-[#121212] border border-[#242424] shadow-sm">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-[#5035E8]/20 border border-[#5035E8]/40 flex items-center justify-center text-[#A594FF] font-extrabold text-2xl shadow-inner shrink-0">
               {member.profiles?.full_name ? member.profiles.full_name.charAt(0).toUpperCase() : <User className="w-7 h-7" />}
@@ -183,7 +183,7 @@ export default function MemberProfile() {
       <div className="grid md:grid-cols-2 gap-6">
         
         {/* Current Plan Card */}
-        <div className="bg-[#121212] border border-[#242424] rounded-[26px] shadow-sm p-6 sm:p-7 flex flex-col justify-between">
+        <div className="bg-[#121212] border border-[#242424] rounded-[13px] shadow-sm p-6 sm:p-7 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-9 h-9 rounded-xl bg-[#FF4B16]/15 border border-[#FF4B16]/30 flex items-center justify-center text-[#FF4B16]">
@@ -295,7 +295,7 @@ export default function MemberProfile() {
         </div>
 
         {/* Membership History Card */}
-        <div className="bg-[#121212] border border-[#242424] rounded-[26px] shadow-sm p-6 sm:p-7 flex flex-col justify-between">
+        <div className="bg-[#121212] border border-[#242424] rounded-[13px] shadow-sm p-6 sm:p-7 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-9 h-9 rounded-xl bg-[#5035E8]/15 border border-[#5035E8]/30 flex items-center justify-center text-[#A594FF]">
