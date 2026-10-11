@@ -4,7 +4,7 @@ import { useAuth } from '@/features/auth/AuthContext';
 import { 
   LogOut, LayoutDashboard, Users, CreditCard, 
   GraduationCap, Building, Calendar, Receipt, ClipboardCheck, 
-  Dumbbell, Trophy, TrendingUp, Bell, PieChart, Menu, X, Activity, ChevronRight 
+  Dumbbell, Trophy, TrendingUp, Bell, PieChart, Menu, X, ChevronRight 
 } from 'lucide-react';
 
 export default function MainLayout() {

@@ -78,4 +78,6 @@ export const router = createBrowserRouter([
   { path: '/auth/reset', element: <ResetPassword /> },
   { path: '/auth/update-password', element: <UpdatePassword /> },
   { path: '/unauthorized', element: <Unauthorized /> }
-]);
+], {
+  basename: import.meta.env.BASE_URL
+});

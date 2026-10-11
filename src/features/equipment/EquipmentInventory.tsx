@@ -6,13 +6,7 @@ import { toast } from 'sonner';
 import { 
   Dumbbell, 
   RotateCcw, 
-  User, 
-  ArrowRightLeft, 
-  CheckCircle2, 
-  AlertTriangle,
-  Loader2,
-  X,
-  PackageCheck
+  ArrowRightLeft 
 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
