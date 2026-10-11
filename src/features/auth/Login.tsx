@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import heroCourtImage from '@/assets/hero-court.jpg';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -32,7 +33,7 @@ export default function Login() {
         {/* Hero Background Sports Image - Opaque */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
-            src="/download%20(8).jpg"
+            src={heroCourtImage}
             alt="playgrid Tennis Court"
             className="w-full h-full object-cover object-center transform scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out select-none pointer-events-none"
           />
@@ -61,7 +62,7 @@ export default function Login() {
           {/* Top Image in Mobile View */}
           <div className="md:hidden relative h-48 w-full overflow-hidden">
             <img
-              src="/download%20(8).jpg"
+              src={heroCourtImage}
               alt="playgrid"
               className="w-full h-full object-cover object-center select-none pointer-events-none"
             />
