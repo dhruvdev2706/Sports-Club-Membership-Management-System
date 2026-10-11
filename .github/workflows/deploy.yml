@@ -33,8 +33,8 @@ jobs:
       - name: Build client
         env:
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://eqbwmngyoohvbhctedvs.supabase.co' }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxYndtbmd5b29odmJoY3RlZHZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE2NTQ4MTgsImV4cCI6MjEwNzIzMDgxOH0.AAzukE_S1lBjwjPfwSItJR40pO0coaPu7TG9v7V5OKI' }}
         run: |
           npm run build
           touch ./dist/.nojekyll
