@@ -31,10 +31,12 @@ export default function MemberProfile() {
           membership_plans (name, fee, duration_months)
         `)
         .eq('id', id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
-    }
+    },
+    retry: false,
+    staleTime: 1000 * 60 * 5,
   });
 
   const { data: membershipsHistory } = useQuery({

@@ -45,7 +45,7 @@ export default function UpdatePassword() {
             <div className="w-9 h-9 rounded-xl bg-[#FF4B16] text-[#111111] flex items-center justify-center font-bold shadow-md shadow-[#FF4B16]/20">
               <Activity className="w-5 h-5 stroke-[2.5]" />
             </div>
-            <span className="text-lg font-extrabold text-[#F5F5F5]">Apex Sports</span>
+            <span className="text-lg font-extrabold text-[#F5F5F5]">playgrid</span>
           </div>
 
           <h2 className="text-2xl font-extrabold tracking-tight text-[#F5F5F5]">Set New Password</h2>

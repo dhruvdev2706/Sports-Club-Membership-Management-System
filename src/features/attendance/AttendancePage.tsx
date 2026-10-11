@@ -5,8 +5,6 @@ import { useAuth } from '../auth/AuthContext';
 import { toast } from 'sonner';
 import { 
   ClipboardCheck, 
-  Users, 
-  Calendar, 
   Check, 
   X as XIcon, 
   Clock 
@@ -104,8 +102,8 @@ export default function AttendancePage() {
       <div className="bg-[#121212] border border-[#242424] rounded-[24px] p-6 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider flex items-center gap-2">
-              <Users className="w-4 h-4 text-[#FF4B16]" /> Select Training Batch
+            <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider block">
+              Select Training Batch
             </label>
             <div className="relative">
               <select 
@@ -130,8 +128,8 @@ export default function AttendancePage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-[#5035E8]" /> Select Scheduled Session
+            <label className="text-xs font-semibold text-[#A6A6AC] uppercase tracking-wider block">
+              Select Scheduled Session
             </label>
             <div className="relative">
               <select 

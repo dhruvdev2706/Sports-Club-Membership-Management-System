@@ -270,18 +270,13 @@ export default function FacilitiesList() {
               className="bg-[#121212] rounded-[26px] border border-[#242424] hover:border-[#383838] shadow-sm hover:-translate-y-1 transition-all overflow-hidden flex flex-col p-7"
             >
               <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#5035E8]/15 border border-[#5035E8]/30 flex items-center justify-center text-[#A594FF] shrink-0">
-                    <Building2 className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-extrabold text-lg text-[#F5F5F5] tracking-tight">{facility.name}</h3>
-                    {facility.location && (
-                      <p className="text-xs text-[#A6A6AC] flex items-center gap-1 mt-0.5">
-                        <MapPin className="w-3.5 h-3.5 text-[#FF4B16]" /> {facility.location}
-                      </p>
-                    )}
-                  </div>
+                <div>
+                  <h3 className="font-extrabold text-lg text-[#F5F5F5] tracking-tight">{facility.name}</h3>
+                  {facility.location && (
+                    <p className="text-xs text-[#A6A6AC] flex items-center gap-1 mt-0.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#FF4B16]" /> {facility.location}
+                    </p>
+                  )}
                 </div>
                 <Badge variant={facility.is_active ? 'green' : 'neutral'} size="sm">
                   {facility.is_active ? 'Open' : 'Closed'}

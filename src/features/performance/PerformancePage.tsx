@@ -5,8 +5,6 @@ import { useAuth } from '../auth/AuthContext';
 import { toast } from 'sonner';
 import { 
   TrendingUp, 
-  Activity, 
-  Target, 
   Save 
 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -94,14 +92,9 @@ export default function PerformancePage() {
         {isAdminOrCoach && (
           <div className="lg:col-span-5 bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-[#FF4B16]/15 border border-[#FF4B16]/30 flex items-center justify-center text-[#FF4B16]">
-                  <Target className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg text-[#F5F5F5] tracking-tight">Record Evaluation</h3>
-                  <p className="text-xs text-[#A6A6AC]">Submit new performance scoring</p>
-                </div>
+              <div className="mb-6">
+                <h3 className="font-bold text-lg text-[#F5F5F5] tracking-tight">Record Evaluation</h3>
+                <p className="text-xs text-[#A6A6AC]">Submit new performance scoring</p>
               </div>
 
               <div className="space-y-5">
@@ -185,14 +178,9 @@ export default function PerformancePage() {
         <div className={`${isAdminOrCoach ? 'lg:col-span-7' : 'lg:col-span-12'} bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-7 shadow-sm flex flex-col justify-between`}>
           <div>
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#5035E8]/15 border border-[#5035E8]/30 flex items-center justify-center text-[#A594FF]">
-                  <Activity className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg text-[#F5F5F5] tracking-tight">Assessment History</h3>
-                  <p className="text-xs text-[#A6A6AC]">Verified coach scorecards</p>
-                </div>
+              <div>
+                <h3 className="font-bold text-lg text-[#F5F5F5] tracking-tight">Assessment History</h3>
+                <p className="text-xs text-[#A6A6AC]">Verified coach scorecards</p>
               </div>
               <Badge variant="neutral" size="sm">
                 {evaluations?.length ?? 0} Records

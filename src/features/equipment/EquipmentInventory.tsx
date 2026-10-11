@@ -12,7 +12,6 @@ import {
   AlertTriangle,
   Loader2,
   X,
-  History,
   PackageCheck
 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -129,8 +128,8 @@ export default function EquipmentInventory() {
 
       {/* Equipment Items Grid */}
       <div>
-        <h3 className="text-lg font-bold text-[#F5F5F5] mb-4 flex items-center gap-2">
-          <Dumbbell className="w-5 h-5 text-[#FF4B16]" /> Gear Stock Availability
+        <h3 className="text-lg font-bold text-[#F5F5F5] mb-4">
+          Gear Stock Availability
         </h3>
 
         {isLoading ? (
@@ -212,8 +211,8 @@ export default function EquipmentInventory() {
 
       {/* Checkout Logs History Table */}
       <div className="space-y-4">
-        <h3 className="text-lg font-bold text-[#F5F5F5] flex items-center gap-2">
-          <History className="w-5 h-5 text-[#5035E8]" /> Active Loan & Checkout Logs
+        <h3 className="text-lg font-bold text-[#F5F5F5]">
+          Active Loan & Checkout Logs
         </h3>
 
         <div className="bg-[#121212] border border-[#242424] rounded-[24px] shadow-sm overflow-hidden flex flex-col">

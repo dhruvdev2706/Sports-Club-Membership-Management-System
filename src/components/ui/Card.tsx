@@ -36,9 +36,9 @@ export const Card: React.FC<CardProps> = ({
   }[variant];
 
   const radiusStyles = {
-    default: 'rounded-[20px]',
-    card: 'rounded-[20px]',
-    panel: 'rounded-[26px]',
+    default: 'rounded-[16px] sm:rounded-[20px]',
+    card: 'rounded-[16px] sm:rounded-[20px]',
+    panel: 'rounded-[18px] sm:rounded-[26px]',
   }[radius];
 
   const interactiveStyles = interactive
@@ -47,7 +47,7 @@ export const Card: React.FC<CardProps> = ({
 
   return (
     <div
-      className={`${radiusStyles} border p-6 ${bgStyles} ${interactiveStyles} ${className}`}
+      className={`${radiusStyles} border p-4 sm:p-6 ${bgStyles} ${interactiveStyles} ${className}`}
       {...props}
     >
       {children}

@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '../auth/AuthContext';
 import { toast } from 'sonner';
-import { Receipt, Download, Plus, DollarSign, CheckCircle2, X } from 'lucide-react';
+import { Receipt, Download, Plus, DollarSign, X } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -104,21 +104,18 @@ export default function PaymentsPage() {
         <StatCard 
           label="Total Collected Volume" 
           value={`$${totalCollected.toFixed(2)}`} 
-          icon={<DollarSign className="w-5 h-5 text-white" />} 
           variant="green"
           description="Verified completed revenue"
         />
         <StatCard 
           label="Total Transactions" 
           value={payments?.length ?? 0} 
-          icon={<Receipt className="w-5 h-5 text-[#111111]" />} 
           variant="white"
           description="Processed payment receipts"
         />
         <StatCard 
           label="Billing Status" 
           value="Up to date" 
-          icon={<CheckCircle2 className="w-5 h-5 text-white" />} 
           variant="purple"
           description="Club accounts reconciled"
         />

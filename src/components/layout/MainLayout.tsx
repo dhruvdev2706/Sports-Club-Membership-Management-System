@@ -82,16 +82,11 @@ export default function MainLayout() {
         <div className="h-[74px] flex items-center justify-between px-6 border-b border-[#1E1E1E] bg-[#000000]">
           <Link 
             to="/" 
-            className="flex items-center gap-3 group" 
+            className="flex flex-col text-left group" 
             onClick={() => setMobileMenuOpen(false)}
           >
-            <div className="w-9 h-9 rounded-xl bg-[#FF4B16] text-[#111111] flex items-center justify-center font-bold shadow-md shadow-[#FF4B16]/20 transition-transform duration-200 group-hover:scale-105">
-              <Activity className="w-5 h-5 stroke-[2.5]" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-[17px] tracking-tight text-[#F5F5F5] leading-none">Apex Sports</span>
-              <span className="text-[10px] uppercase font-semibold tracking-wider text-[#A6A6AC] mt-1">Club Management</span>
-            </div>
+            <span className="font-extrabold text-[19px] tracking-tight text-[#F5F5F5] leading-none">playgrid</span>
+            <span className="text-[10px] uppercase font-semibold tracking-wider text-[#A6A6AC] mt-1.5">Club Management</span>
           </Link>
           <button 
             className="p-1.5 rounded-lg md:hidden text-[#A6A6AC] hover:text-white hover:bg-[#1A1A1A] transition-colors"
@@ -179,51 +174,26 @@ export default function MainLayout() {
       <div className="flex-1 flex flex-col min-w-0 bg-[#080808]">
         
         {/* Top Header */}
-        <header className="h-[74px] flex items-center justify-between px-6 lg:px-10 z-10 sticky top-0 bg-[#080808]/85 backdrop-blur-md border-b border-[#1A1A1A]">
-          <div className="flex items-center gap-3">
+        <header className="h-[68px] sm:h-[74px] flex items-center justify-between px-4 sm:px-6 lg:px-10 z-10 sticky top-0 bg-[#080808]/85 backdrop-blur-md border-b border-[#1A1A1A]">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button 
-              className="md:hidden p-2 -ml-2 text-[#A6A6AC] hover:text-[#F5F5F5] rounded-xl hover:bg-[#1A1A1A] transition-colors cursor-pointer"
+              className="md:hidden p-2 -ml-1 text-[#A6A6AC] hover:text-[#F5F5F5] rounded-xl hover:bg-[#1A1A1A] transition-colors cursor-pointer"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open navigation menu"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <span className="text-xs uppercase font-bold tracking-wider text-[#A6A6AC] hidden sm:inline">Portal /</span>
-              <h2 className="text-xl font-bold text-[#F5F5F5] tracking-tight">
+              <h2 className="text-lg sm:text-xl font-bold text-[#F5F5F5] tracking-tight truncate max-w-[200px] sm:max-w-none">
                 {currentNavItem.label}
               </h2>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <Link 
-              to="/notifications" 
-              className="relative p-2.5 text-[#A6A6AC] hover:text-[#F5F5F5] bg-[#141414] hover:bg-[#1F1F1F] rounded-xl transition-colors border border-[#242424] shadow-sm cursor-pointer"
-              aria-label="Notifications"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-[#FF4B16] rounded-full ring-2 ring-[#080808]"></span>
-            </Link>
-            
-            <div className="flex items-center gap-2.5 bg-[#141414] pl-2 pr-3.5 py-1.5 rounded-xl border border-[#242424] shadow-sm">
-              <div className="w-7 h-7 rounded-lg bg-[#5035E8]/20 border border-[#5035E8]/40 flex items-center justify-center text-[#A594FF] font-bold text-xs">
-                {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : 'U'}
-              </div>
-              <div className="hidden sm:flex flex-col text-left">
-                <span className="text-xs font-semibold text-[#F5F5F5] truncate max-w-[120px] leading-tight">
-                  {profile?.full_name?.split(' ')[0] || 'User'}
-                </span>
-                <span className="text-[10px] text-[#A6A6AC] capitalize leading-none">
-                  {profile?.role || 'Member'}
-                </span>
-              </div>
             </div>
           </div>
         </header>
         
         {/* Page Main Content */}
-        <main className="flex-1 overflow-y-auto p-6 sm:p-8 lg:p-10 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 custom-scrollbar">
           <div className="max-w-[1440px] mx-auto">
             <Outlet />
           </div>

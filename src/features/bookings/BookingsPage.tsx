@@ -5,10 +5,7 @@ import { useAuth } from '../auth/AuthContext';
 import { toast } from 'sonner';
 import { 
   Calendar as CalendarIcon, 
-  Clock, 
-  XCircle, 
-  Building2, 
-  CalendarDays
+  XCircle 
 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
@@ -195,8 +192,8 @@ export default function BookingsPage() {
         {/* Left Side: Venue & Date Selector & Time Slots (7 Cols) */}
         <div className="lg:col-span-7 space-y-6">
           <div className="bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-7 shadow-sm">
-            <h3 className="font-bold text-lg text-[#F5F5F5] mb-5 flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-[#FF4B16]" /> Select Facility & Date
+            <h3 className="font-bold text-lg text-[#F5F5F5] mb-5">
+              Select Facility & Date
             </h3>
 
             {/* Facility Selector Tabs */}
@@ -221,19 +218,16 @@ export default function BookingsPage() {
 
             {/* Date Picker Input */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-[#181818] border border-[#262626] mb-6">
-              <div className="flex items-center gap-3">
-                <CalendarDays className="w-5 h-5 text-[#5035E8]" />
-                <div>
-                  <span className="text-xs uppercase font-bold text-[#A6A6AC]">Reservation Date</span>
-                  <p className="text-sm font-semibold text-[#F5F5F5]">
-                    {new Date(selectedDate + 'T00:00:00').toLocaleDateString(undefined, {
-                      weekday: 'long',
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric'
-                    })}
-                  </p>
-                </div>
+              <div>
+                <span className="text-xs uppercase font-bold text-[#A6A6AC]">Reservation Date</span>
+                <p className="text-sm font-semibold text-[#F5F5F5]">
+                  {new Date(selectedDate + 'T00:00:00').toLocaleDateString(undefined, {
+                    weekday: 'long',
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </p>
               </div>
               <input 
                 type="date"
@@ -317,8 +311,7 @@ export default function BookingsPage() {
         <div className="lg:col-span-5 bg-[#121212] border border-[#242424] rounded-[26px] p-6 sm:p-7 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h3 className="font-bold text-lg text-[#F5F5F5] flex items-center gap-2">
-                <Clock className="w-5 h-5 text-[#5035E8]" /> 
+              <h3 className="font-bold text-lg text-[#F5F5F5]">
                 {isAdmin ? 'All Club Reservations' : 'Your Reserved Slots'}
               </h3>
               <Badge variant="neutral" size="sm">

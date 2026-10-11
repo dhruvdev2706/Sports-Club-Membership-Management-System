@@ -42,7 +42,7 @@ export default function ResetPassword() {
             <div className="w-9 h-9 rounded-xl bg-[#FF4B16] text-[#111111] flex items-center justify-center font-bold shadow-md shadow-[#FF4B16]/20">
               <Activity className="w-5 h-5 stroke-[2.5]" />
             </div>
-            <span className="text-lg font-extrabold text-[#F5F5F5]">Apex Sports</span>
+            <span className="text-lg font-extrabold text-[#F5F5F5]">playgrid</span>
           </div>
 
           <h2 className="text-2xl font-extrabold tracking-tight text-[#F5F5F5]">Reset Password</h2>
@@ -72,7 +72,7 @@ export default function ResetPassword() {
               <input 
                 type="email" 
                 required 
-                placeholder="athlete@apexclub.com"
+                placeholder="athlete@playgrid.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm placeholder:text-[#555555] focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all"

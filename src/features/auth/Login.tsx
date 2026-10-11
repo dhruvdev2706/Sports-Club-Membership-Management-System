@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Activity, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 export default function Login() {
@@ -19,7 +19,7 @@ export default function Login() {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success('Welcome back to Apex Sports');
+      toast.success('Welcome back to playgrid');
       navigate('/');
     }
     setLoading(false);
@@ -28,61 +28,54 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#080808] text-[#F5F5F5]">
       {/* Brand Showcase Panel - Left */}
-      <div className="hidden md:flex md:w-1/2 lg:w-5/12 bg-[#000000] border-r border-[#1E1E1E] flex-col justify-between p-12 lg:p-16 relative overflow-hidden">
-        {/* Subtle decorative glow accents */}
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#FF4B16]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#5035E8]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="hidden md:flex md:w-1/2 lg:w-5/12 bg-black border-r border-[#1E1E1E] flex-col justify-between p-8 lg:p-14 relative overflow-hidden group">
+        {/* Hero Background Sports Image - Opaque */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <img
+            src="/download%20(8).jpg"
+            alt="playgrid Tennis Court"
+            className="w-full h-full object-cover object-center transform scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out select-none pointer-events-none"
+          />
+          {/* Subtle top & bottom gradient to maintain text legibility while keeping the court image vivid and open in the center */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-transparent to-black/80 pointer-events-none" />
+        </div>
 
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-16">
-            <div className="w-10 h-10 rounded-xl bg-[#FF4B16] text-[#111111] flex items-center justify-center font-extrabold shadow-lg shadow-[#FF4B16]/25">
-              <Activity className="w-6 h-6 stroke-[2.5]" />
-            </div>
-            <span className="text-xl font-extrabold tracking-tight text-[#F5F5F5]">Apex Sports</span>
-          </div>
-
-          <h1 className="text-4xl lg:text-5xl font-extrabold leading-tight mb-6 tracking-tight text-[#F5F5F5]">
+        {/* Top: Headline */}
+        <div className="relative z-10 max-w-md">
+          <h1 className="text-3xl lg:text-5xl font-extrabold leading-tight tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.7)]">
             The modern sports club platform.
           </h1>
-          <p className="text-base text-[#A6A6AC] max-w-sm mb-10 leading-relaxed">
+        </div>
+
+        {/* Bottom: Description */}
+        <div className="relative z-10 max-w-md">
+          <p className="text-sm lg:text-lg text-white/95 leading-relaxed font-normal drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
             Manage memberships, book courts, track athlete training progress, and coordinate tournaments all in one high-performance interface.
           </p>
-
-          <div className="space-y-3.5 pt-4 border-t border-[#1E1E1E]">
-            <div className="flex items-center gap-3 text-sm text-[#CCCCCC]">
-              <CheckCircle2 className="w-4 h-4 text-[#079C68] shrink-0" />
-              <span>Instant court & facility availability reservations</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm text-[#CCCCCC]">
-              <CheckCircle2 className="w-4 h-4 text-[#079C68] shrink-0" />
-              <span>Real-time subscription billing & receipt invoices</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm text-[#CCCCCC]">
-              <CheckCircle2 className="w-4 h-4 text-[#079C68] shrink-0" />
-              <span>Coach evaluations & training attendance logs</span>
-            </div>
-          </div>
-        </div>
-        
-        <div className="relative z-10 text-xs text-[#777777] font-medium pt-8">
-          Apex Sports Club Membership Management Platform.
         </div>
       </div>
 
       {/* Form Panel - Right */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 lg:p-16">
-        <div className="w-full max-w-[420px] bg-[#121212] border border-[#242424] rounded-[28px] p-8 sm:p-10 shadow-2xl space-y-7">
-          
-          <div>
-            <div className="md:hidden flex items-center gap-2.5 mb-6">
-              <div className="w-8 h-8 rounded-xl bg-[#FF4B16] text-[#111111] flex items-center justify-center font-bold">
-                <Activity className="w-5 h-5 stroke-[2.5]" />
-              </div>
-              <span className="text-lg font-extrabold text-[#F5F5F5]">Apex Sports</span>
+      <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-10 lg:p-16">
+        <div className="w-full max-w-[420px] bg-[#121212] border border-[#242424] rounded-none shadow-2xl overflow-hidden">
+          {/* Top Image in Mobile View */}
+          <div className="md:hidden relative h-48 w-full overflow-hidden">
+            <img
+              src="/download%20(8).jpg"
+              alt="playgrid"
+              className="w-full h-full object-cover object-center select-none pointer-events-none"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-black/20 to-black/60 pointer-events-none" />
+            <div className="absolute top-4 left-5">
+              <span className="text-lg font-black tracking-tight text-white drop-shadow-md">playgrid</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#F5F5F5]">Welcome back</h2>
-            <p className="text-xs text-[#A6A6AC] mt-1.5">Sign in to your account with your verified credentials</p>
           </div>
+
+          <div className="p-6 sm:p-10 space-y-6 sm:space-y-7">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#F5F5F5]">Welcome back</h2>
+              <p className="text-xs text-[#A6A6AC] mt-1.5">Sign in to your account with your verified credentials</p>
+            </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-1.5">
@@ -90,7 +83,7 @@ export default function Login() {
               <input 
                 type="email" 
                 required 
-                placeholder="athlete@apexclub.com"
+                placeholder="athlete@playgrid.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm placeholder:text-[#555555] focus:outline-none focus:border-[#FF4B16] focus:ring-2 focus:ring-[#FF4B16]/20 transition-all"
@@ -141,6 +134,7 @@ export default function Login() {
                 Apply for Membership
               </Link>
             </p>
+          </div>
           </div>
         </div>
       </div>

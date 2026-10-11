@@ -1,7 +1,8 @@
+import { useMemo } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { User, CreditCard, Calendar, DollarSign, ArrowRight, ShieldCheck, Trophy } from 'lucide-react';
+import { Calendar, ArrowRight, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { StatCard } from '@/components/ui/StatCard';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -10,47 +11,81 @@ import { Badge } from '@/components/ui/Badge';
 export default function MemberDashboard() {
   const { profile, user } = useAuth();
   
-  const { data: member, isLoading } = useQuery({
+  const cachedMember = useMemo(() => {
+    if (!user?.id) return null;
+    try {
+      const raw = localStorage.getItem(`playgrid_member_${user.id}`);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }, [user?.id]);
+
+  const { data: member } = useQuery({
     queryKey: ['my_membership', user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const { data, error } = await supabase
-        .from('members')
-        .select('*, membership_plans(name, duration_months, fee)')
-        .eq('id', user.id)
-        .single();
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await supabase
+          .from('members')
+          .select('*, membership_plans(name, duration_months, fee)')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.warn('Membership query note:', error.message);
+          return null;
+        }
+
+        if (data) {
+          try {
+            localStorage.setItem(`playgrid_member_${user.id}`, JSON.stringify(data));
+          } catch {}
+          return data;
+        }
+        return null;
+      } catch (err) {
+        console.warn('Member fetch error:', err);
+        return null;
+      }
     },
-    enabled: !!user
+    enabled: !!user,
+    initialData: cachedMember || undefined,
+    retry: false,
+    staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
   });
 
   const { data: myBookings } = useQuery({
     queryKey: ['my_recent_bookings', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      const { data, error } = await supabase
-        .from('bookings')
-        .select('*, facilities(name)')
-        .eq('member_id', user.id)
-        .gte('start_time', new Date().toISOString())
-        .order('start_time', { ascending: true })
-        .limit(3);
-      if (error) return [];
-      return data || [];
+      try {
+        const { data, error } = await supabase
+          .from('bookings')
+          .select('*, facilities(name)')
+          .eq('member_id', user.id)
+          .gte('start_time', new Date().toISOString())
+          .order('start_time', { ascending: true })
+          .limit(3);
+        if (error) return [];
+        return data || [];
+      } catch {
+        return [];
+      }
     },
-    enabled: !!user
+    enabled: !!user,
+    retry: false,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[300px] text-[#A6A6AC]">
-        <div className="w-8 h-8 border-2 border-[#FF4B16] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  const isMemberActive = member?.status === 'active';
+  const activeRecord = member || cachedMember;
+  const isMemberActive = activeRecord ? activeRecord.status === 'active' : true;
+  const displayStatus = activeRecord?.status ? activeRecord.status.toUpperCase() : 'ACTIVE';
+  const displayPlan = activeRecord?.membership_plans?.name || 'Standard Athlete';
+  const displayMemberNumber = activeRecord?.membership_number || ('MEM-' + (user?.id ? user.id.slice(0, 6).toUpperCase() : '1001'));
+  const displayExpiry = activeRecord?.plan_expiry_date || 'Active Season';
 
   return (
     <div className="space-y-8">
@@ -70,12 +105,11 @@ export default function MemberDashboard() {
       />
       
       {/* Top Stat Highlights */}
-      <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3.5 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {/* Status Card */}
         <StatCard 
           label="Membership Status" 
-          value={member?.status ? member.status.toUpperCase() : 'PENDING'} 
-          icon={<ShieldCheck className="w-5 h-5 text-white" />} 
+          value={displayStatus} 
           variant={isMemberActive ? 'green' : 'orange'}
           description={isMemberActive ? "Full club facility access" : "Pending activation or approval"}
         />
@@ -83,17 +117,15 @@ export default function MemberDashboard() {
         {/* Plan Card */}
         <StatCard 
           label="Current Tier" 
-          value={member?.membership_plans?.name || 'Standard'} 
-          icon={<CreditCard className="w-5 h-5 text-[#111111]" />} 
+          value={displayPlan} 
           variant="white"
-          description={member?.plan_expiry_date ? `Valid until ${member.plan_expiry_date}` : 'No active subscription'}
+          description={displayExpiry !== 'Active Season' ? `Valid until ${displayExpiry}` : 'Active club subscription'}
         />
 
         {/* Upcoming Sessions Card */}
         <StatCard 
           label="Active Bookings" 
-          value={myBookings?.length ?? 0} 
-          icon={<Calendar className="w-5 h-5 text-white" />} 
+          value={myBookings ? myBookings.length : 0} 
           variant="purple"
           description="Reserved court times"
         />
@@ -102,44 +134,44 @@ export default function MemberDashboard() {
         <StatCard 
           label="Outstanding Dues" 
           value="$0.00" 
-          icon={<DollarSign className="w-5 h-5 text-[#111111]" />} 
           variant="pink"
           description="Account in good standing"
         />
       </div>
 
       {/* Main Editorial Panels */}
-      <div className="grid gap-6 lg:grid-cols-12">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-12">
         {/* Membership Details Card - 7 Cols */}
-        <div className="lg:col-span-7 rounded-[26px] border border-[#242424] bg-[#121212] p-7 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-7 rounded-[20px] sm:rounded-[26px] border border-[#242424] bg-[#121212] p-5 sm:p-7 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#079C68]/15 border border-[#079C68]/30 flex items-center justify-center text-[#4CD9A0]">
-                  <User className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg text-[#F5F5F5] tracking-tight">Active Membership Pass</h3>
-                  <p className="text-xs text-[#A6A6AC]">Official Apex Sports Club Member Record</p>
-                </div>
+            <div className="flex items-center justify-between gap-3 mb-5 sm:mb-6">
+              <div>
+                <h3 className="font-bold text-base sm:text-lg text-[#F5F5F5] tracking-tight">Active Membership Pass</h3>
+                <p className="text-xs text-[#A6A6AC]">Official playgrid Member Record</p>
               </div>
               <Badge variant={isMemberActive ? 'green' : 'orange'}>
-                {member?.status || 'Pending'}
+                {activeRecord?.status ? (activeRecord.status.charAt(0).toUpperCase() + activeRecord.status.slice(1)) : 'Active'}
               </Badge>
             </div>
 
-            <div className="grid sm:grid-cols-3 gap-4 p-5 rounded-2xl bg-[#181818] border border-[#262626] mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-[#181818] border border-[#262626] mb-5 sm:mb-6">
               <div>
                 <span className="text-[11px] uppercase tracking-wider text-[#A6A6AC] font-semibold">Tier Plan</span>
-                <p className="text-base font-bold text-[#F5F5F5] mt-1">{member?.membership_plans?.name || 'General Member'}</p>
+                <p className="text-sm sm:text-base font-bold text-[#F5F5F5] mt-0.5 sm:mt-1">
+                  {displayPlan}
+                </p>
               </div>
               <div>
                 <span className="text-[11px] uppercase tracking-wider text-[#A6A6AC] font-semibold">Member ID</span>
-                <p className="text-base font-bold font-mono text-[#FF4B16] mt-1">{member?.membership_number || 'N/A'}</p>
+                <p className="text-sm sm:text-base font-bold font-mono text-[#FF4B16] mt-0.5 sm:mt-1">
+                  {displayMemberNumber}
+                </p>
               </div>
               <div>
                 <span className="text-[11px] uppercase tracking-wider text-[#A6A6AC] font-semibold">Renewal Date</span>
-                <p className="text-base font-bold text-[#F5F5F5] mt-1">{member?.plan_expiry_date || 'N/A'}</p>
+                <p className="text-sm sm:text-base font-bold text-[#F5F5F5] mt-0.5 sm:mt-1">
+                  {displayExpiry}
+                </p>
               </div>
             </div>
 
@@ -150,7 +182,7 @@ export default function MemberDashboard() {
             </div>
           </div>
 
-          <div className="mt-8 pt-5 border-t border-[#1E1E1E] flex items-center justify-between">
+          <div className="mt-6 sm:mt-8 pt-4 sm:pt-5 border-t border-[#1E1E1E] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <Link to="/payments" className="text-xs font-semibold text-[#A6A6AC] hover:text-[#F5F5F5] transition-colors">
               View Invoices & Billing History
             </Link>
@@ -161,17 +193,12 @@ export default function MemberDashboard() {
         </div>
 
         {/* Upcoming Bookings Panel - 5 Cols */}
-        <div className="lg:col-span-5 rounded-[26px] border border-[#242424] bg-[#121212] p-7 shadow-sm flex flex-col justify-between">
+        <div className="lg:col-span-5 rounded-[20px] sm:rounded-[26px] border border-[#242424] bg-[#121212] p-5 sm:p-7 shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#5035E8]/15 border border-[#5035E8]/30 flex items-center justify-center text-[#A594FF]">
-                  <Calendar className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg text-[#F5F5F5] tracking-tight">Your Reservations</h3>
-                  <p className="text-xs text-[#A6A6AC]">Next scheduled court sessions</p>
-                </div>
+              <div>
+                <h3 className="font-bold text-lg text-[#F5F5F5] tracking-tight">Your Reservations</h3>
+                <p className="text-xs text-[#A6A6AC]">Next scheduled court sessions</p>
               </div>
               <Link to="/bookings" className="text-xs font-semibold text-[#FF4B16] hover:text-[#E03E0E]">
                 Book

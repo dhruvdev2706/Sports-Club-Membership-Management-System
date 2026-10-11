@@ -81,33 +81,33 @@ export const StatCard: React.FC<StatCardProps> = ({
 
   return (
     <div
-      className={`rounded-[24px] border p-6 flex flex-col justify-between transition-all duration-200 min-h-[160px] ${variantStyles.card} ${className}`}
+      className={`rounded-[18px] sm:rounded-[24px] border p-4 sm:p-6 flex flex-col justify-between transition-all duration-200 min-h-[128px] sm:min-h-[160px] ${variantStyles.card} ${className}`}
     >
-      <div className="flex items-center justify-between gap-3 mb-4">
-        <span className={`text-xs uppercase tracking-wider ${variantStyles.label}`}>
+      <div className="flex items-center justify-between gap-2.5 sm:gap-3 mb-3 sm:mb-4">
+        <span className={`text-[11px] sm:text-xs uppercase tracking-wider font-semibold ${variantStyles.label}`}>
           {label}
         </span>
         {icon && (
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${variantStyles.iconBox}`}>
+          <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0 ${variantStyles.iconBox}`}>
             {icon}
           </div>
         )}
       </div>
 
       <div>
-        <div className="flex items-baseline gap-2.5 flex-wrap">
-          <span className={`text-3xl sm:text-4xl tracking-tight leading-none ${variantStyles.value}`}>
+        <div className="flex items-baseline gap-2 sm:gap-2.5 flex-wrap">
+          <span className={`text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-none ${variantStyles.value}`}>
             {value}
           </span>
           {change && (
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${variantStyles.badge}`}>
+            <span className={`text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full ${variantStyles.badge}`}>
               {trend === 'up' ? '↑ ' : trend === 'down' ? '↓ ' : ''}
               {change}
             </span>
           )}
         </div>
         {description && (
-          <p className={`text-xs mt-2 ${variantStyles.desc}`}>{description}</p>
+          <p className={`text-[11px] sm:text-xs mt-1.5 sm:mt-2 leading-relaxed ${variantStyles.desc}`}>{description}</p>
         )}
       </div>
     </div>

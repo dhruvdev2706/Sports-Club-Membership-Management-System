@@ -57,28 +57,28 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         role="dialog"
         aria-modal="true"
-        className={`relative w-full ${maxWidthStyles} bg-[#141414] border border-[#282828] rounded-[24px] sm:rounded-[28px] p-6 sm:p-7 shadow-2xl text-[#F5F5F5] z-10 my-auto animate-in fade-in zoom-in-95 duration-200`}
+        className={`relative w-full ${maxWidthStyles} max-h-[90vh] flex flex-col bg-[#141414] border border-[#282828] rounded-[20px] sm:rounded-[28px] p-5 sm:p-7 shadow-2xl text-[#F5F5F5] z-10 my-auto animate-in fade-in zoom-in-95 duration-200`}
       >
-        <div className="flex items-start justify-between gap-4 mb-5 pb-3 border-b border-[#222222]">
+        <div className="flex items-start justify-between gap-3 sm:gap-4 mb-4 sm:mb-5 pb-3 border-b border-[#222222] shrink-0">
           <div>
             {title && (
-              <h2 className="text-xl font-bold tracking-tight text-[#F5F5F5]">
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-[#F5F5F5]">
                 {title}
               </h2>
             )}
             {description && (
-              <p className="text-xs text-[#A6A6AC] mt-1">{description}</p>
+              <p className="text-xs text-[#A6A6AC] mt-0.5 sm:mt-1">{description}</p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-[#A6A6AC] hover:text-[#F5F5F5] hover:bg-[#242424] transition-colors cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-xl text-[#A6A6AC] hover:text-[#F5F5F5] hover:bg-[#242424] transition-colors cursor-pointer"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div>{children}</div>
+        <div className="overflow-y-auto custom-scrollbar flex-1 -mr-1 pr-1">{children}</div>
       </div>
     </div>
   );

@@ -229,7 +229,7 @@ export default function TournamentsPage() {
             <input 
               required
               type="text" 
-              placeholder="e.g. Apex Annual Summer Open"
+              placeholder="e.g. playgrid Annual Summer Open"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-4 py-2.5 border border-[#242424] rounded-xl bg-[#0A0A0A] text-[#F5F5F5] text-sm focus:outline-none focus:border-[#FF4B16]"

@@ -103,7 +103,7 @@ export default function AdminDashboard() {
       />
       
       {/* Varied Bold Statistic Cards Grid */}
-      <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3.5 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {/* Light Contrast Card: Total Members */}
         <StatCard 
           label="Total Members" 
@@ -142,25 +142,25 @@ export default function AdminDashboard() {
       </div>
       
       {/* Asymmetric Editorial Grid for Visualizations and Activities */}
-      <div className="grid gap-6 lg:grid-cols-12">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-12">
         
         {/* Main Chart Panel - 7 Cols */}
-        <div className="lg:col-span-7 rounded-[26px] border border-[#242424] bg-[#0E0E0E] p-6 sm:p-8 shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-6">
+        <div className="lg:col-span-7 rounded-[20px] sm:rounded-[26px] border border-[#242424] bg-[#0E0E0E] p-4 sm:p-7 lg:p-8 shadow-sm flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-3 mb-5 sm:mb-6">
             <div>
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#FF4B16]"></span>
-                <h3 className="font-bold text-lg text-[#F5F5F5] tracking-tight">Membership Growth</h3>
+                <h3 className="font-bold text-base sm:text-lg text-[#F5F5F5] tracking-tight">Membership Growth</h3>
               </div>
               <p className="text-xs text-[#A6A6AC] mt-1">Net cumulative membership acquisition over past 6 months</p>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-xs font-semibold text-[#A6A6AC]">
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] text-[11px] sm:text-xs font-semibold text-[#A6A6AC] shrink-0">
               <TrendingUp className="w-3.5 h-3.5 text-[#079C68]" />
-              <span>Active Growth</span>
+              <span className="hidden sm:inline">Active Growth</span>
             </div>
           </div>
 
-          <div className="h-[320px] w-full">
+          <div className="h-[240px] sm:h-[300px] lg:h-[320px] w-full">
             {stats?.growthData && stats.growthData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={stats.growthData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
@@ -207,10 +207,10 @@ export default function AdminDashboard() {
         </div>
         
         {/* Secondary Activity Panels - 5 Cols */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
+        <div className="lg:col-span-5 flex flex-col gap-5 sm:gap-6">
           
           {/* Today's Bookings Card */}
-          <div className="rounded-[26px] border border-[#242424] bg-[#121212] p-6 shadow-sm flex flex-col justify-between flex-1">
+          <div className="rounded-[20px] sm:rounded-[26px] border border-[#242424] bg-[#121212] p-4 sm:p-6 shadow-sm flex flex-col justify-between flex-1">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-base text-[#F5F5F5] tracking-tight">Today's Schedule</h3>
               <Link 
