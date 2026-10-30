@@ -19,6 +19,7 @@ import membersRoutes from './routes/members.js';
 import bookingsRoutes from './routes/bookings.js';
 import paymentsRoutes from './routes/payments.js';
 import equipmentRoutes from './routes/equipment.js';
+import coachesRoutes from './routes/coaches.js';
 
 // API Routes
 app.use('/api/auth', authRoutes);
@@ -26,6 +27,7 @@ app.use('/api/members', membersRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/equipment', equipmentRoutes);
+app.use('/api/coaches', coachesRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

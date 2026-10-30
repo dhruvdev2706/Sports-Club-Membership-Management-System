@@ -1,15 +1,20 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/features/auth/AuthContext';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Search, Filter, ChevronRight, User, Users } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Badge } from '@/components/ui/Badge';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { toast } from 'sonner';
 
 export default function MembersList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
+  const { profile } = useAuth();
+  const queryClient = useQueryClient();
+  const isAdmin = profile?.role === 'admin';
   
   const statusFilter = searchParams.get('status') || 'all';
 
@@ -21,16 +26,46 @@ export default function MembersList() {
         .select(`
           id,
           membership_number,
+          coach_id,
           status,
           plan_expiry_date,
           profiles (full_name, email),
-          membership_plans (name)
+          membership_plans (name),
+          assigned_coach:coaches!members_coach_id_fkey (id, profiles (full_name))
         `)
         .order('created_at', { ascending: false });
         
       if (error) throw error;
       return data;
     }
+  });
+
+  const { data: coaches = [] } = useQuery({
+    queryKey: ['coach_options'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('coaches')
+        .select('id, profiles!inner(full_name, role)')
+        .eq('profiles.role', 'coach')
+        .order('full_name', { referencedTable: 'profiles' });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const assignCoach = useMutation({
+    mutationFn: async ({ memberId, coachId }: { memberId: string; coachId: string | null }) => {
+      const { error } = await supabase
+        .from('members')
+        .update({ coach_id: coachId })
+        .eq('id', memberId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Member coach assignment updated');
+      queryClient.invalidateQueries({ queryKey: ['members'] });
+    },
+    onError: (error: Error) => toast.error(error.message),
   });
 
   const filteredMembers = members?.filter((m: any) => {
@@ -120,6 +155,7 @@ export default function MembersList() {
                 <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Member</th>
                 <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Member #</th>
                 <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Tier Plan</th>
+                <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Coach</th>
                 <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Status</th>
                 <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider">Expiry Date</th>
                 <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-right">Profile</th>
@@ -128,7 +164,7 @@ export default function MembersList() {
             <tbody className="divide-y divide-[#1E1E1E]">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-16 text-center text-[#A6A6AC]">
+                  <td colSpan={7} className="px-6 py-16 text-center text-[#A6A6AC]">
                     <div className="flex flex-col items-center justify-center gap-3">
                       <div className="w-8 h-8 border-2 border-[#FF4B16] border-t-transparent rounded-full animate-spin" />
                       <span className="text-sm font-medium">Loading members directory...</span>
@@ -169,6 +205,31 @@ export default function MembersList() {
                       {m.membership_plans?.name || <span className="text-[#555555]">No Plan Assigned</span>}
                     </td>
                     <td className="px-6 py-4">
+                      {isAdmin ? (
+                        <select
+                          aria-label={`Assign coach to ${m.profiles?.full_name || 'member'}`}
+                          value={m.coach_id || ''}
+                          disabled={assignCoach.isPending}
+                          onChange={(event) => assignCoach.mutate({
+                            memberId: m.id,
+                            coachId: event.target.value || null,
+                          })}
+                          className="max-w-48 rounded-lg border border-[#2A2A2A] bg-[#0A0A0A] px-2.5 py-2 text-xs text-[#F5F5F5] focus:border-[#FF4B16] focus:outline-none"
+                        >
+                          <option value="">Unassigned</option>
+                          {coaches.map((coach: any) => (
+                            <option key={coach.id} value={coach.id}>
+                              {coach.profiles?.full_name || 'Unnamed Coach'}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span className="text-xs text-[#A6A6AC]">
+                          {m.assigned_coach?.profiles?.full_name || 'Unassigned'}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
                       {getStatusBadge(m.status)}
                     </td>
                     <td className="px-6 py-4 text-xs font-medium text-[#A6A6AC]">
@@ -194,7 +255,7 @@ export default function MembersList() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="p-8">
+                  <td colSpan={7} className="p-8">
                     <EmptyState 
                       icon={<Users className="w-8 h-8" />}
                       title="No members match criteria"

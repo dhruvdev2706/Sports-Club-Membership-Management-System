@@ -1,5 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import { supabaseAdmin } from '../utils/supabase';
+import { supabaseAdmin } from '../utils/supabase.js';
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+      profile?: any;
+    }
+  }
+}
 
 export interface AuthRequest extends Request {
   user?: any;

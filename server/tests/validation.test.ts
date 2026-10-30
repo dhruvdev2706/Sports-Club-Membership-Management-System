@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isBookingInPast, isValidDuration } from '../utils/validation';
+import { isBookingInPast, isValidDuration } from '../utils/validation.js';
 
 describe('Booking Business Rules Validation', () => {
   it('should reject bookings in the past', () => {

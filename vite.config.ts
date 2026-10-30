@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
@@ -18,5 +19,8 @@ export default defineConfig({
         changeOrigin: true,
       }
     }
+  },
+  test: {
+    exclude: ['**/node_modules/**', '**/dist/**']
   }
 })
